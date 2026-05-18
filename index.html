@@ -8,18 +8,12 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
-/* Auth */
 #authScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f5f5f5}
 .auth-card{background:#fff;border-radius:12px;border:1px solid #e5e5e5;padding:2rem;width:340px}
 .auth-card h2{font-size:18px;font-weight:500;margin-bottom:1.5rem;text-align:center}
-.auth-card .field{margin-bottom:12px}
-.auth-card label{font-size:13px;color:#666;display:block;margin-bottom:4px}
-.auth-card input{width:100%;font-size:14px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
-.auth-card input:focus{border-color:#378ADD}
 .auth-card .err{font-size:13px;color:#E24B4A;margin-top:8px;min-height:18px}
 .auth-card button{width:100%;margin-top:12px;padding:9px;background:#378ADD;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer}
 .auth-card button:hover{background:#185FA5}
-/* App */
 #appScreen{display:none;padding:1rem 1.5rem}
 .toolbar{display:flex;align-items:center;gap:10px;padding:0.75rem 0 1rem;flex-wrap:wrap}
 .toolbar h2{font-size:18px;font-weight:500;flex:1;min-width:150px}
@@ -30,6 +24,11 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
 .add-btn:hover{background:#f5f5f5}
 .signout-btn{background:none;border:1px solid #ddd;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;color:#888}
 .signout-btn:hover{background:#f5f5f5}
+.search-wrap{position:relative}
+.search-wrap input{font-size:14px;padding:6px 10px 6px 30px;border:1px solid #ddd;border-radius:8px;outline:none;width:180px}
+.search-wrap input:focus{border-color:#378ADD}
+.search-icon{position:absolute;left:9px;top:7px;color:#aaa;font-size:14px;pointer-events:none}
+#searchDropdown{display:none;position:absolute;top:36px;left:0;width:300px;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:200;max-height:260px;overflow-y:auto}
 .calendar{width:100%;border-collapse:collapse}
 .calendar th{font-size:12px;color:#666;padding:4px 6px;text-align:left;border-bottom:1px solid #eee;font-weight:500}
 .calendar td{vertical-align:top;border:1px solid #eee;padding:4px;height:90px;width:calc(100%/7);cursor:pointer}
@@ -38,19 +37,6 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
 .day-num.today{background:#378ADD;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-weight:500}
 .day-num.other-month{color:#ccc}
 .job-bar{font-size:10px;border-radius:3px;padding:1px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:100;align-items:center;justify-content:center}
-.modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:12px;border:1px solid #e5e5e5;padding:1.5rem;width:380px;max-width:95vw}
-.modal h3{font-size:16px;font-weight:500;margin-bottom:1rem}
-.field{margin-bottom:12px}
-.field label{font-size:13px;color:#666;display:block;margin-bottom:4px}
-.field input,.field select{width:100%;font-size:14px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
-.field input:focus,.field select:focus{border-color:#378ADD}
-.modal-btns{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
-.modal-btns button{font-size:14px;padding:6px 16px;border-radius:8px;cursor:pointer;border:1px solid #ddd;background:none}
-.modal-btns .save-btn{background:#378ADD;color:#fff;border-color:#378ADD}
-.modal-btns .save-btn:hover{background:#185FA5}
-.modal-btns .del-btn{color:#E24B4A;border-color:#E24B4A}
 .conflict-panel{background:#f9f9f9;border:1px solid #eee;border-radius:12px;padding:1rem;margin-top:1rem}
 .conflict-panel h3{font-size:14px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .conflict-item{font-size:13px;color:#555;padding:4px 0;border-bottom:1px solid #eee}
@@ -60,12 +46,28 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
 .legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#555}
 .legend-swatch{width:12px;height:12px;border-radius:2px}
 .cat-note{font-size:11px;color:#aaa;margin-left:2px}
-.loading{text-align:center;padding:2rem;color:#888;font-size:14px}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;padding:1.5rem;width:390px;max-width:95vw;position:relative;z-index:1001}
+.modal-box h3{font-size:16px;font-weight:500;margin-bottom:1rem}
+.field{margin-bottom:12px}
+.field label{font-size:13px;color:#666;display:block;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;font-size:14px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#378ADD}
+.field textarea{resize:vertical}
+.modal-btns{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
+.modal-btns button{font-size:14px;padding:7px 18px;border-radius:8px;cursor:pointer;border:1px solid #ddd;background:#fff}
+.modal-btns button:hover{background:#f5f5f5}
+.modal-btns .save-btn{background:#378ADD;color:#fff;border-color:#378ADD}
+.modal-btns .save-btn:hover{background:#185FA5}
+.modal-btns .save-btn:disabled{background:#aaa;border-color:#aaa;cursor:not-allowed}
+.modal-btns .del-btn{color:#E24B4A;border-color:#E24B4A}
+.modal-btns .del-btn:hover{background:#fff5f5}
 </style>
 </head>
 <body>
 
-<!-- Login screen -->
 <div id="authScreen">
   <div class="auth-card">
     <h2>Team Scheduler</h2>
@@ -76,7 +78,6 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
   </div>
 </div>
 
-<!-- App -->
 <div id="appScreen">
   <div class="toolbar">
     <h2>Team Scheduler</h2>
@@ -84,58 +85,53 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
     <span class="month-label" id="monthLabel"></span>
     <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
     <button class="add-btn" onclick="openAddModal()">+ Add job</button>
-    <div style="position:relative">
-      <input type="text" id="searchInput" placeholder="Search jobs..." oninput="onSearch()" style="font-size:14px;padding:6px 10px 6px 30px;border:1px solid #ddd;border-radius:8px;outline:none;width:180px" onfocus="this.style.borderColor='#378ADD'" onblur="this.style.borderColor='#ddd'">
-      <span style="position:absolute;left:9px;top:7px;color:#aaa;font-size:14px">&#128269;</span>
-      <div id="searchDropdown" style="display:none;position:absolute;top:36px;left:0;width:280px;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:200;max-height:260px;overflow-y:auto"></div>
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="searchInput" placeholder="Search jobs..." oninput="onSearch()">
+      <div id="searchDropdown"></div>
     </div>
     <button class="signout-btn" onclick="signOut()">Sign out</button>
   </div>
-
   <div class="legend" id="legend"></div>
-
   <table class="calendar">
-    <thead><tr>
-      <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
-    </tr></thead>
+    <thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
     <tbody id="calBody"></tbody>
   </table>
-
   <div class="conflict-panel">
     <h3>&#9888; Double assignments <span id="conflictCount" style="font-size:12px;padding:2px 8px;border-radius:12px;font-weight:400"></span></h3>
     <div id="conflictList"></div>
   </div>
 </div>
 
-<!-- Job modal -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
+<!-- Modal — completely separate from app, outside all other containers -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
     <h3 id="modalTitle">Add job</h3>
     <div class="field"><label>Job name</label><input type="text" id="fName" placeholder="e.g. AV install – Main Hall"></div>
+    <div class="field"><label>SEQF number <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="fSeqf" placeholder="e.g. SEQF-1234"></div>
     <div class="field"><label>Category</label><select id="fCat"></select></div>
     <div class="field"><label>Assigned to</label><select id="fPerson"></select></div>
     <div class="field"><label>Start date</label><input type="date" id="fStart"></div>
     <div class="field"><label>End date</label><input type="date" id="fEnd"></div>
-    <div class="field"><label>SEQF number <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="fSeqf" placeholder="e.g. SEQF-1234"></div>
-    <div class="field"><label>Notes <span style="color:#aaa;font-weight:400">(optional)</span></label><textarea id="fNotes" rows="3" placeholder="e.g. Bring spare cables, client contact is John on 07700..." style="width:100%;font-size:14px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;resize:vertical;font-family:inherit"></textarea></div>
+    <div class="field"><label>Notes <span style="color:#aaa;font-weight:400">(optional)</span></label><textarea id="fNotes" rows="3" placeholder="e.g. Bring spare cables, client contact is John..."></textarea></div>
     <div class="modal-btns">
-      <button id="delBtn" class="del-btn" onclick="deleteJob()" style="display:none">Delete</button>
-      <button onclick="closeModal()">Cancel</button>
-      <button class="save-btn" onclick="saveJob()">Save</button>
+      <button id="delBtn" class="del-btn" style="display:none;margin-right:auto" onclick="deleteJob()">Delete</button>
+      <button id="cancelBtn">Cancel</button>
+      <button id="saveBtn" class="save-btn" onclick="saveJob()">Save</button>
     </div>
   </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://xtuexrktnzrwadgvqeaw.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0dWV4cmt0bnpyd2FkZ3ZxZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTE0MTcsImV4cCI6MjA5NDY4NzQxN30.h7r4T9sePBDyGGEQy_FOaWzk2EKjVPDyfzXe--7Rl4k';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL='https://xtuexrktnzrwadgvqeaw.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0dWV4cmt0bnpyd2FkZ3ZxZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTE0MTcsImV4cCI6MjA5NDY4NzQxN30.h7r4T9sePBDyGGEQy_FOaWzk2EKjVPDyfzXe--7Rl4k';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const PEOPLE = ['Ashton','Scott','Chris','Ross','Aiden','Alain'];
-const CATEGORIES = [
-  {id:'work',    label:'Offsite work',  color:'#F5C842', noConflict:false},
-  {id:'witness', label:'Witness test',  color:'#E67E22', noConflict:true},
-  {id:'leave',   label:'Annual leave',  color:'#E24B4A', noConflict:false},
+const PEOPLE=['Ashton','Scott','Chris','Ross','Aiden','Alain'];
+const CATEGORIES=[
+  {id:'work',   label:'Offsite work', color:'#F5C842',noConflict:false},
+  {id:'witness',label:'Witness test', color:'#E67E22',noConflict:true},
+  {id:'leave',  label:'Annual leave', color:'#E24B4A',noConflict:false},
 ];
 function getCat(id){return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]}
 
@@ -144,7 +140,7 @@ let curYear=new Date().getFullYear();
 let curMonth=new Date().getMonth()+1;
 let editingId=null;
 
-// Auth
+// --- Auth ---
 async function signIn(){
   const email=document.getElementById('authEmail').value.trim();
   const pass=document.getElementById('authPass').value;
@@ -153,46 +149,89 @@ async function signIn(){
   if(error){document.getElementById('authErr').textContent=error.message;return;}
   showApp();
 }
-
 async function signOut(){
   await sb.auth.signOut();
   document.getElementById('appScreen').style.display='none';
   document.getElementById('authScreen').style.display='flex';
 }
-
 async function showApp(){
   document.getElementById('authScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
   await loadJobs();
   render();
 }
+sb.auth.onAuthStateChange((e,s)=>{if(s)showApp();});
 
-sb.auth.onAuthStateChange((event,session)=>{
-  if(session)showApp();
-});
-
-// Data
+// --- Data ---
 async function loadJobs(){
   const{data,error}=await sb.from('jobs').select('*').order('start_date');
-  if(!error)jobs=data.map(j=>({
-    id:j.id, name:j.name, cat:j.cat, person:j.person,
-    start:j.start_date, end:j.end_date, notes:j.notes, seqf:j.seqf
-  }));
+  if(!error)jobs=data.map(j=>({id:j.id,name:j.name,cat:j.cat,person:j.person,start:j.start_date,end:j.end_date,notes:j.notes,seqf:j.seqf}));
+}
+
+// --- Modal ---
+function openModal(){document.getElementById('modalOverlay').classList.add('open');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+
+document.getElementById('cancelBtn').addEventListener('click',function(e){
+  e.stopPropagation();
+  closeModal();
+});
+
+document.getElementById('modalOverlay').addEventListener('click',function(e){
+  if(e.target===this)closeModal();
+});
+
+function openAddModal(){
+  editingId=null;
+  document.getElementById('modalTitle').textContent='Add job';
+  document.getElementById('fName').value='';
+  document.getElementById('fSeqf').value='';
+  document.getElementById('fNotes').value='';
+  buildCatSelect(CATEGORIES[0].id);
+  buildPersonSelect(PEOPLE[0]);
+  const t=fmt(new Date());
+  document.getElementById('fStart').value=t;
+  document.getElementById('fEnd').value=t;
+  document.getElementById('delBtn').style.display='none';
+  document.getElementById('saveBtn').disabled=false;
+  document.getElementById('saveBtn').textContent='Save';
+  openModal();
+}
+function openAddModalDate(date){
+  openAddModal();
+  document.getElementById('fStart').value=date;
+  document.getElementById('fEnd').value=date;
+}
+function openEditModal(id){
+  editingId=id;
+  const j=jobs.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent='Edit job';
+  document.getElementById('fName').value=j.name;
+  document.getElementById('fSeqf').value=j.seqf||'';
+  document.getElementById('fNotes').value=j.notes||'';
+  buildCatSelect(j.cat||CATEGORIES[0].id);
+  buildPersonSelect(j.person);
+  document.getElementById('fStart').value=j.start;
+  document.getElementById('fEnd').value=j.end;
+  document.getElementById('delBtn').style.display='inline-block';
+  document.getElementById('saveBtn').disabled=false;
+  document.getElementById('saveBtn').textContent='Save';
+  openModal();
 }
 
 async function saveJob(){
-  const btn=document.querySelector('.save-btn');
+  const btn=document.getElementById('saveBtn');
   if(btn.disabled)return;
-  btn.disabled=true;btn.textContent='Saving...';
   const name=document.getElementById('fName').value.trim();
+  const seqf=document.getElementById('fSeqf').value.trim()||null;
   const cat=document.getElementById('fCat').value;
   const person=document.getElementById('fPerson').value;
   const start=document.getElementById('fStart').value;
   const end=document.getElementById('fEnd').value;
   const notes=document.getElementById('fNotes').value.trim()||null;
-  const seqf=document.getElementById('fSeqf').value.trim()||null;
-  if(!name||!start||!end){btn.disabled=false;btn.textContent='Save';alert('Please fill in all fields.');return;}
-  if(start>end){btn.disabled=false;btn.textContent='Save';alert('End date must be on or after start date.');return;}
+  if(!name||!start||!end){alert('Please fill in all fields.');return;}
+  if(start>end){alert('End date must be on or after start date.');return;}
+  btn.disabled=true;btn.textContent='Saving...';
   closeModal();
   if(editingId){
     await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes,seqf}).eq('id',editingId);
@@ -205,15 +244,22 @@ async function saveJob(){
 
 async function deleteJob(){
   if(!confirm('Delete this job?'))return;
-  await sb.from('jobs').delete().eq('id',editingId);
   closeModal();
+  await sb.from('jobs').delete().eq('id',editingId);
   await loadJobs();
   render();
 }
 
-// Calendar
+// --- Calendar ---
 function toDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
 function fmt(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+function buildCatSelect(val){
+  document.getElementById('fCat').innerHTML=CATEGORIES.map(c=>`<option value="${c.id}"${c.id===val?' selected':''}>${c.label}</option>`).join('');
+}
+function buildPersonSelect(val){
+  document.getElementById('fPerson').innerHTML=PEOPLE.map(p=>`<option${p===val?' selected':''}>${p}</option>`).join('');
+}
 
 function render(){
   document.getElementById('monthLabel').textContent=new Date(curYear,curMonth-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
@@ -227,21 +273,17 @@ function render(){
   for(let i=dow-1;i>=0;i--)cells.push({date:fmt(new Date(curYear,curMonth-2,pd-i)),other:true});
   for(let d=1;d<=dim;d++)cells.push({date:fmt(new Date(curYear,curMonth-1,d)),other:false});
   while(cells.length%7!==0)cells.push({date:fmt(new Date(curYear,curMonth,cells.length-dim-dow+1)),other:true});
-
   for(let r=0;r<cells.length/7;r++){
     const tr=document.createElement('tr');
     for(let c=0;c<7;c++){
       const cell=cells[r*7+c];
       const td=document.createElement('td');
-      td.onclick=()=>openAddModalDate(cell.date);
+      td.addEventListener('click',()=>openAddModalDate(cell.date));
       const dn=document.createElement('div');
       dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
       dn.textContent=parseInt(cell.date.split('-')[2]);
       td.appendChild(dn);
-      jobs.filter(j=>{
-        const s=toDate(j.start),e=toDate(j.end),cd=toDate(cell.date);
-        return cd>=s&&cd<=e;
-      }).forEach(j=>{
+      jobs.filter(j=>{const s=toDate(j.start),e=toDate(j.end),cd=toDate(cell.date);return cd>=s&&cd<=e;}).forEach(j=>{
         const cat=getCat(j.cat);
         const bar=document.createElement('div');
         bar.className='job-bar';
@@ -249,7 +291,7 @@ function render(){
         bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
         bar.style.borderLeft=`2px solid ${cat.color}`;
         bar.textContent=(j.seqf?j.seqf+' - ':'')+j.name+(j.notes?' 📋':'')+' ('+j.person+')';
-        bar.onclick=(e)=>{e.stopPropagation();openEditModal(j.id)};
+        bar.addEventListener('click',e=>{e.stopPropagation();openEditModal(j.id);});
         td.appendChild(bar);
       });
       tr.appendChild(td);
@@ -300,60 +342,32 @@ function changeMonth(d){
   render();
 }
 
-function buildCatSelect(val){
-  document.getElementById('fCat').innerHTML=CATEGORIES.map(c=>`<option value="${c.id}"${c.id===val?' selected':''}>${c.label}</option>`).join('');
-}
-function buildPersonSelect(val){
-  document.getElementById('fPerson').innerHTML=PEOPLE.map(p=>`<option${p===val?' selected':''}>${p}</option>`).join('');
-}
-
-function openAddModal(){
-  editingId=null;
-  document.getElementById('modalTitle').textContent='Add job';
-  document.getElementById('fName').value='';
-  buildCatSelect(CATEGORIES[0].id);
-  buildPersonSelect(PEOPLE[0]);
-  const t=fmt(new Date());
-  document.getElementById('fStart').value=t;
-  document.getElementById('fEnd').value=t;
-  document.getElementById('fSeqf').value='';
-  document.getElementById('fNotes').value='';
-  document.getElementById('delBtn').style.display='none';
-  document.getElementById('modalBg').classList.add('open');
-}
-function openAddModalDate(date){
-  openAddModal();
-  document.getElementById('fStart').value=date;
-  document.getElementById('fEnd').value=date;
-}
-function openEditModal(id){
-  editingId=id;
-  const j=jobs.find(x=>x.id===id);
-  document.getElementById('modalTitle').textContent='Edit job';
-  document.getElementById('fName').value=j.name;
-  buildCatSelect(j.cat||CATEGORIES[0].id);
-  buildPersonSelect(j.person);
-  document.getElementById('fStart').value=j.start;
-  document.getElementById('fEnd').value=j.end;
-  document.getElementById('fSeqf').value=j.seqf||'';
-  document.getElementById('fNotes').value=j.notes||'';
-  document.getElementById('delBtn').style.display='inline-block';
-  document.getElementById('modalBg').classList.add('open');
-}
+// --- Search ---
 function onSearch(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const dd=document.getElementById('searchDropdown');
   if(!q){dd.style.display='none';return;}
-  const matches=jobs.filter(j=>j.name.toLowerCase().includes(q)||j.person.toLowerCase().includes(q)||(j.notes&&j.notes.toLowerCase().includes(q))||(j.seqf&&j.seqf.toLowerCase().includes(q)));
+  const matches=jobs.filter(j=>
+    j.name.toLowerCase().includes(q)||
+    j.person.toLowerCase().includes(q)||
+    (j.seqf&&j.seqf.toLowerCase().includes(q))||
+    (j.notes&&j.notes.toLowerCase().includes(q))
+  );
   if(!matches.length){dd.innerHTML='<div style="padding:10px 12px;font-size:13px;color:#888">No jobs found</div>';dd.style.display='block';return;}
   dd.innerHTML=matches.map(j=>{
     const cat=getCat(j.cat);
-    return`<div onclick="jumpToJob('${j.id}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='#fff'">
+    return`<div data-id="${j.id}" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px">
       <span style="width:8px;height:8px;border-radius:2px;background:${cat.color};flex-shrink:0"></span>
-      <div><div style="font-size:13px;font-weight:500">${j.name}${j.seqf?` <span style="font-size:11px;color:#888;font-weight:400">${j.seqf}</span>`:''}</div><div style="font-size:11px;color:#888">${j.person} &middot; ${j.start} to ${j.end}</div></div>
+      <div>
+        <div style="font-size:13px;font-weight:500">${j.name}${j.seqf?` <span style="font-size:11px;color:#888;font-weight:400">${j.seqf}</span>`:''}</div>
+        <div style="font-size:11px;color:#888">${j.person} &middot; ${j.start} to ${j.end}</div>
+      </div>
     </div>`;
   }).join('');
   dd.style.display='block';
+  dd.querySelectorAll('[data-id]').forEach(el=>{
+    el.addEventListener('click',()=>jumpToJob(el.dataset.id));
+  });
 }
 
 function jumpToJob(id){
@@ -372,11 +386,9 @@ function jumpToJob(id){
 }
 
 document.addEventListener('click',e=>{
-  if(!e.target.closest('#searchInput')&&!e.target.closest('#searchDropdown')&&!e.target.closest('.modal'))
+  if(!e.target.closest('.search-wrap'))
     document.getElementById('searchDropdown').style.display='none';
 });
-
-
 </script>
 </body>
 </html>
