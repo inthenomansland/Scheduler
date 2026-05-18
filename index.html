@@ -129,6 +129,7 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const PEOPLE=['Unassigned','Ashton','Scott','Chris','Ross','Aiden','Alain'];
+const CONFLICT_CHECK_PEOPLE=['Ashton','Chris','Ross','Aiden','Alain'];
 const CATEGORIES=[
   {id:'work',   label:'Offsite work', color:'#F5C842',noConflict:false},
   {id:'witness',label:'Witness test', color:'#E67E22',noConflict:true},
@@ -282,6 +283,9 @@ function render(){
     for(let c=0;c<7;c++){
       const cell=cells[r*7+c];
       const td=document.createElement('td');
+      const busyPeople=new Set(jobs.filter(j=>{const s=toDate(j.start),e=toDate(j.end),cd=toDate(cell.date);return cd>=s&&cd<=e;}).map(j=>j.person));
+      const teamFull=CONFLICT_CHECK_PEOPLE.every(p=>busyPeople.has(p));
+      if(teamFull)td.style.outline='2px solid #E24B4A';
       td.addEventListener('click',()=>openAddModalDate(cell.date));
       const dn=document.createElement('div');
       dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
