@@ -369,7 +369,7 @@ function jumpToJob(id){
 }
 
 document.addEventListener('click',e=>{
-  if(!e.target.closest('#searchInput')&&!e.target.closest('#searchDropdown'))
+  if(!e.target.closest('#searchInput')&&!e.target.closest('#searchDropdown')&&!e.target.closest('.modal'))
     document.getElementById('searchDropdown').style.display='none';
 });
 
