@@ -116,6 +116,7 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
     <div class="field"><label>Assigned to</label><select id="fPerson"></select></div>
     <div class="field"><label>Start date</label><input type="date" id="fStart"></div>
     <div class="field"><label>End date</label><input type="date" id="fEnd"></div>
+    <div class="field"><label>SEQF number <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="fSeqf" placeholder="e.g. SEQF-1234"></div>
     <div class="field"><label>Notes <span style="color:#aaa;font-weight:400">(optional)</span></label><textarea id="fNotes" rows="3" placeholder="e.g. Bring spare cables, client contact is John on 07700..." style="width:100%;font-size:14px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;resize:vertical;font-family:inherit"></textarea></div>
     <div class="modal-btns">
       <button id="delBtn" class="del-btn" onclick="deleteJob()" style="display:none">Delete</button>
@@ -175,7 +176,7 @@ async function loadJobs(){
   const{data,error}=await sb.from('jobs').select('*').order('start_date');
   if(!error)jobs=data.map(j=>({
     id:j.id, name:j.name, cat:j.cat, person:j.person,
-    start:j.start_date, end:j.end_date, notes:j.notes
+    start:j.start_date, end:j.end_date, notes:j.notes, seqf:j.seqf
   }));
 }
 
@@ -186,12 +187,13 @@ async function saveJob(){
   const start=document.getElementById('fStart').value;
   const end=document.getElementById('fEnd').value;
   const notes=document.getElementById('fNotes').value.trim()||null;
+  const seqf=document.getElementById('fSeqf').value.trim()||null;
   if(!name||!start||!end){alert('Please fill in all fields.');return;}
   if(start>end){alert('End date must be on or after start date.');return;}
   if(editingId){
-    await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes}).eq('id',editingId);
+    await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes,seqf}).eq('id',editingId);
   } else {
-    await sb.from('jobs').insert({name,cat,person,start_date:start,end_date:end,notes});
+    await sb.from('jobs').insert({name,cat,person,start_date:start,end_date:end,notes,seqf});
   }
   closeModal();
   await loadJobs();
@@ -311,6 +313,7 @@ function openAddModal(){
   const t=fmt(new Date());
   document.getElementById('fStart').value=t;
   document.getElementById('fEnd').value=t;
+  document.getElementById('fSeqf').value='';
   document.getElementById('fNotes').value='';
   document.getElementById('delBtn').style.display='none';
   document.getElementById('modalBg').classList.add('open');
@@ -329,6 +332,7 @@ function openEditModal(id){
   buildPersonSelect(j.person);
   document.getElementById('fStart').value=j.start;
   document.getElementById('fEnd').value=j.end;
+  document.getElementById('fSeqf').value=j.seqf||'';
   document.getElementById('fNotes').value=j.notes||'';
   document.getElementById('delBtn').style.display='inline-block';
   document.getElementById('modalBg').classList.add('open');
@@ -337,13 +341,13 @@ function onSearch(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const dd=document.getElementById('searchDropdown');
   if(!q){dd.style.display='none';return;}
-  const matches=jobs.filter(j=>j.name.toLowerCase().includes(q)||j.person.toLowerCase().includes(q)||(j.notes&&j.notes.toLowerCase().includes(q)));
+  const matches=jobs.filter(j=>j.name.toLowerCase().includes(q)||j.person.toLowerCase().includes(q)||(j.notes&&j.notes.toLowerCase().includes(q))||(j.seqf&&j.seqf.toLowerCase().includes(q)));
   if(!matches.length){dd.innerHTML='<div style="padding:10px 12px;font-size:13px;color:#888">No jobs found</div>';dd.style.display='block';return;}
   dd.innerHTML=matches.map(j=>{
     const cat=getCat(j.cat);
     return`<div onclick="jumpToJob('${j.id}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='#fff'">
       <span style="width:8px;height:8px;border-radius:2px;background:${cat.color};flex-shrink:0"></span>
-      <div><div style="font-size:13px;font-weight:500">${j.name}</div><div style="font-size:11px;color:#888">${j.person} &middot; ${j.start} to ${j.end}</div></div>
+      <div><div style="font-size:13px;font-weight:500">${j.name}${j.seqf?` <span style="font-size:11px;color:#888;font-weight:400">${j.seqf}</span>`:''}</div><div style="font-size:11px;color:#888">${j.person} &middot; ${j.start} to ${j.end}</div></div>
     </div>`;
   }).join('');
   dd.style.display='block';
