@@ -84,6 +84,11 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
     <span class="month-label" id="monthLabel"></span>
     <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
     <button class="add-btn" onclick="openAddModal()">+ Add job</button>
+    <div style="position:relative">
+      <input type="text" id="searchInput" placeholder="Search jobs..." oninput="onSearch()" style="font-size:14px;padding:6px 10px 6px 30px;border:1px solid #ddd;border-radius:8px;outline:none;width:180px" onfocus="this.style.borderColor='#378ADD'" onblur="this.style.borderColor='#ddd'">
+      <span style="position:absolute;left:9px;top:7px;color:#aaa;font-size:14px">&#128269;</span>
+      <div id="searchDropdown" style="display:none;position:absolute;top:36px;left:0;width:280px;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:200;max-height:260px;overflow-y:auto"></div>
+    </div>
     <button class="signout-btn" onclick="signOut()">Sign out</button>
   </div>
 
@@ -328,7 +333,43 @@ function openEditModal(id){
   document.getElementById('delBtn').style.display='inline-block';
   document.getElementById('modalBg').classList.add('open');
 }
-function closeModal(){document.getElementById('modalBg').classList.remove('open')}
+function onSearch(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  const dd=document.getElementById('searchDropdown');
+  if(!q){dd.style.display='none';return;}
+  const matches=jobs.filter(j=>j.name.toLowerCase().includes(q)||j.person.toLowerCase().includes(q)||(j.notes&&j.notes.toLowerCase().includes(q)));
+  if(!matches.length){dd.innerHTML='<div style="padding:10px 12px;font-size:13px;color:#888">No jobs found</div>';dd.style.display='block';return;}
+  dd.innerHTML=matches.map(j=>{
+    const cat=getCat(j.cat);
+    return`<div onclick="jumpToJob('${j.id}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='#fff'">
+      <span style="width:8px;height:8px;border-radius:2px;background:${cat.color};flex-shrink:0"></span>
+      <div><div style="font-size:13px;font-weight:500">${j.name}</div><div style="font-size:11px;color:#888">${j.person} &middot; ${j.start} to ${j.end}</div></div>
+    </div>`;
+  }).join('');
+  dd.style.display='block';
+}
+
+function jumpToJob(id){
+  const j=jobs.find(x=>x.id===id);
+  if(!j)return;
+  const d=toDate(j.start);
+  curYear=d.getFullYear();curMonth=d.getMonth()+1;
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchDropdown').style.display='none';
+  render();
+  setTimeout(()=>{
+    const bars=[...document.querySelectorAll('.job-bar')];
+    const bar=bars.find(b=>b.textContent.includes(j.name));
+    if(bar){bar.scrollIntoView({behavior:'smooth',block:'center'});bar.style.outline='2px solid #378ADD';setTimeout(()=>bar.style.outline='',1500);}
+  },50);
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#searchInput')&&!e.target.closest('#searchDropdown'))
+    document.getElementById('searchDropdown').style.display='none';
+});
+
+
 </script>
 </body>
 </html>
