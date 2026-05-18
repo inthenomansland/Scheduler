@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Scheduler</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;padding:1rem 1.5rem;background:#fff;color:#1a1a1a}
+.toolbar{display:flex;align-items:center;gap:10px;padding:1rem 0;flex-wrap:wrap}
+.toolbar h2{font-size:18px;font-weight:500;flex:1;min-width:150px}
+.nav-btn{background:none;border:1px solid #ddd;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px}
+.nav-btn:hover{background:#f5f5f5}
+.month-label{font-size:15px;font-weight:500;min-width:130px;text-align:center}
+.add-btn{background:none;border:1px solid #ddd;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:6px}
+.add-btn:hover{background:#f5f5f5}
+.calendar{width:100%;border-collapse:collapse}
+.calendar th{font-size:12px;color:#666;padding:4px 6px;text-align:left;border-bottom:1px solid #eee;font-weight:500}
+.calendar td{vertical-align:top;border:1px solid #eee;padding:4px;height:90px;width:calc(100%/7);cursor:pointer}
+.calendar td:hover{background:#fafafa}
+.day-num{font-size:12px;color:#888;margin-bottom:2px}
+.day-num.today{background:#378ADD;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-weight:500}
+.day-num.other-month{color:#ccc}
+.job-bar{font-size:10px;border-radius:3px;padding:1px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:12px;border:1px solid #e5e5e5;padding:1.5rem;width:380px;max-width:95vw}
+.modal h3{font-size:16px;font-weight:500;margin-bottom:1rem}
+.field{margin-bottom:12px}
+.field label{font-size:13px;color:#666;display:block;margin-bottom:4px}
+.field input,.field select{width:100%;font-size:14px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
+.field input:focus,.field select:focus{border-color:#378ADD}
+.modal-btns{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
+.modal-btns button{font-size:14px;padding:6px 16px;border-radius:8px;cursor:pointer;border:1px solid #ddd;background:none}
+.modal-btns .save-btn{background:#378ADD;color:#fff;border-color:#378ADD}
+.modal-btns .save-btn:hover{background:#185FA5}
+.modal-btns .del-btn{color:#E24B4A;border-color:#E24B4A}
+.conflict-panel{background:#f9f9f9;border:1px solid #eee;border-radius:12px;padding:1rem;margin-top:1rem}
+.conflict-panel h3{font-size:14px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.conflict-item{font-size:13px;color:#555;padding:4px 0;border-bottom:1px solid #eee}
+.conflict-item:last-child{border-bottom:none}
+.no-conflicts{font-size:13px;color:#888;font-style:italic}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0.75rem;align-items:center}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#555}
+.legend-swatch{width:12px;height:12px;border-radius:2px}
+.cat-note{font-size:11px;color:#aaa;margin-left:4px}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h2>Team Scheduler</h2>
+  <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
+  <span class="month-label" id="monthLabel"></span>
+  <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
+  <button class="add-btn" onclick="openAddModal()">+ Add job</button>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<table class="calendar">
+  <thead><tr>
+    <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+  </tr></thead>
+  <tbody id="calBody"></tbody>
+</table>
+
+<div class="conflict-panel">
+  <h3>&#9888; Double assignments <span id="conflictCount" style="font-size:12px;padding:2px 8px;border-radius:12px;font-weight:400"></span></h3>
+  <div id="conflictList"></div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Add job</h3>
+    <div class="field"><label>Job name</label><input type="text" id="fName" placeholder="e.g. AV install – Main Hall"></div>
+    <div class="field"><label>Category</label><select id="fCat" onchange="onCatChange()"></select></div>
+    <div class="field"><label>Assigned to</label><select id="fPerson"></select></div>
+    <div class="field"><label>Start date</label><input type="date" id="fStart"></div>
+    <div class="field"><label>End date</label><input type="date" id="fEnd"></div>
+    <div class="modal-btns">
+      <button id="delBtn" class="del-btn" onclick="deleteJob()" style="display:none">Delete</button>
+      <button onclick="closeModal()">Cancel</button>
+      <button class="save-btn" onclick="saveJob()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PEOPLE = ['Ashton','Scott','Chris','Ross','Aiden','Alain'];
+
+const CATEGORIES = [
+  {id:'work',     label:'Offsite work',  color:'#F5C842', noConflict:false},
+  {id:'witness',  label:'Witness test',  color:'#E67E22', noConflict:true},
+  {id:'leave',    label:'Annual leave',  color:'#E24B4A', noConflict:false},
+];
+
+function getCat(id){return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]}
+
+const STORAGE_KEY='team_scheduler_jobs';
+const ID_KEY='team_scheduler_nextid';
+
+function loadJobs(){
+  try{const r=localStorage.getItem(STORAGE_KEY);if(r)return JSON.parse(r);}catch(e){}
+  return[];
+}
+function saveJobs(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(jobs));localStorage.setItem(ID_KEY,String(nextId));}catch(e){}
+}
+
+let jobs=loadJobs();
+let nextId=parseInt(localStorage.getItem(ID_KEY)||'1');
+let curYear=new Date().getFullYear();
+let curMonth=new Date().getMonth()+1;
+let editingId=null;
+
+function toDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function fmt(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+function buildCatSelect(val){
+  document.getElementById('fCat').innerHTML=CATEGORIES.map(c=>`<option value="${c.id}"${c.id===val?' selected':''}>${c.label}</option>`).join('');
+}
+
+function onCatChange(){}
+
+function buildPersonSelect(val){
+  document.getElementById('fPerson').innerHTML=PEOPLE.map(p=>`<option${p===val?' selected':''}>${p}</option>`).join('');
+}
+
+function buildLegend(){
+  const leg=document.getElementById('legend');
+  leg.innerHTML='';
+  CATEGORIES.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='legend-item';
+    d.innerHTML=`<span class="legend-swatch" style="background:${c.color}"></span>${c.label}${c.noConflict?'<span class="cat-note">(conflicts excluded)</span>':''}`;
+    leg.appendChild(d);
+  });
+}
+
+function render(){
+  document.getElementById('monthLabel').textContent=new Date(curYear,curMonth-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
+  const tbody=document.getElementById('calBody');tbody.innerHTML='';
+  const first=new Date(curYear,curMonth-1,1);
+  let dow=first.getDay();dow=dow===0?6:dow-1;
+  const dim=new Date(curYear,curMonth,0).getDate();
+  const today=fmt(new Date());
+  let cells=[];
+  const pd=new Date(curYear,curMonth-1,0).getDate();
+  for(let i=dow-1;i>=0;i--)cells.push({date:fmt(new Date(curYear,curMonth-2,pd-i)),other:true});
+  for(let d=1;d<=dim;d++)cells.push({date:fmt(new Date(curYear,curMonth-1,d)),other:false});
+  while(cells.length%7!==0)cells.push({date:fmt(new Date(curYear,curMonth,cells.length-dim-dow+1)),other:true});
+
+  for(let r=0;r<cells.length/7;r++){
+    const tr=document.createElement('tr');
+    for(let c=0;c<7;c++){
+      const cell=cells[r*7+c];
+      const td=document.createElement('td');
+      td.onclick=()=>openAddModalDate(cell.date);
+      const dn=document.createElement('div');
+      dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
+      dn.textContent=parseInt(cell.date.split('-')[2]);
+      td.appendChild(dn);
+      jobs.filter(j=>{
+        const s=toDate(j.start),e=toDate(j.end),cd=toDate(cell.date);
+        return cd>=s&&cd<=e;
+      }).forEach(j=>{
+        const cat=getCat(j.cat);
+        const bar=document.createElement('div');
+        bar.className='job-bar';
+        bar.style.background=cat.color+'33';
+        bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
+        bar.style.borderLeft=`2px solid ${cat.color}`;
+        bar.textContent=j.name+' ('+j.person+')';
+        bar.onclick=(e)=>{e.stopPropagation();openEditModal(j.id)};
+        td.appendChild(bar);
+      });
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  buildLegend();
+  renderConflicts();
+}
+
+function renderConflicts(){
+  const conflicts=[];
+  const checkable=jobs.filter(j=>!getCat(j.cat).noConflict);
+  for(let i=0;i<checkable.length;i++){
+    for(let k=i+1;k<checkable.length;k++){
+      const a=checkable[i],b=checkable[k];
+      if(a.person!==b.person)continue;
+      const aS=toDate(a.start),aE=toDate(a.end),bS=toDate(b.start),bE=toDate(b.end);
+      if(aS<=bE&&bS<=aE){
+        const os=new Date(Math.max(aS,bS)),oe=new Date(Math.min(aE,bE));
+        conflicts.push({person:a.person,job1:a.name,job2:b.name,from:fmt(os),to:fmt(oe)});
+      }
+    }
+  }
+  const list=document.getElementById('conflictList');
+  const count=document.getElementById('conflictCount');
+  count.textContent=conflicts.length+' issue'+(conflicts.length===1?'':'s');
+  count.style.background=conflicts.length?'#FCEBEB':'#EAF3DE';
+  count.style.color=conflicts.length?'#A32D2D':'#3B6D11';
+  list.innerHTML=conflicts.length
+    ?conflicts.map(c=>`<div class="conflict-item"><strong>${c.person}</strong>: <strong>${c.job1}</strong> and <strong>${c.job2}</strong> overlap ${c.from===c.to?'on '+c.from:'from '+c.from+' to '+c.to}</div>`).join('')
+    :'<p class="no-conflicts">No double assignments.</p>';
+}
+
+function changeMonth(d){
+  curMonth+=d;
+  if(curMonth>12){curMonth=1;curYear++}
+  if(curMonth<1){curMonth=12;curYear--}
+  render();
+}
+
+function openAddModal(){
+  editingId=null;
+  document.getElementById('modalTitle').textContent='Add job';
+  document.getElementById('fName').value='';
+  buildCatSelect(CATEGORIES[0].id);
+  buildPersonSelect(PEOPLE[0]);
+  const t=fmt(new Date());
+  document.getElementById('fStart').value=t;
+  document.getElementById('fEnd').value=t;
+  document.getElementById('delBtn').style.display='none';
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function openAddModalDate(date){
+  openAddModal();
+  document.getElementById('fStart').value=date;
+  document.getElementById('fEnd').value=date;
+}
+
+function openEditModal(id){
+  editingId=id;
+  const j=jobs.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent='Edit job';
+  document.getElementById('fName').value=j.name;
+  buildCatSelect(j.cat||CATEGORIES[0].id);
+  buildPersonSelect(j.person);
+  document.getElementById('fStart').value=j.start;
+  document.getElementById('fEnd').value=j.end;
+  document.getElementById('delBtn').style.display='inline-block';
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modalBg').classList.remove('open')}
+
+function saveJob(){
+  const name=document.getElementById('fName').value.trim();
+  const cat=document.getElementById('fCat').value;
+  const person=document.getElementById('fPerson').value;
+  const start=document.getElementById('fStart').value;
+  const end=document.getElementById('fEnd').value;
+  if(!name||!start||!end){alert('Please fill in all fields.');return;}
+  if(start>end){alert('End date must be on or after start date.');return;}
+  if(editingId){Object.assign(jobs.find(x=>x.id===editingId),{name,cat,person,start,end});}
+  else{jobs.push({id:nextId++,name,cat,person,start,end});}
+  saveJobs();closeModal();render();
+}
+
+function deleteJob(){
+  if(!confirm('Delete this job?'))return;
+  jobs=jobs.filter(j=>j.id!==editingId);
+  saveJobs();closeModal();render();
+}
+
+render();
+</script>
+</body>
+</html>
