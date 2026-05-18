@@ -181,6 +181,9 @@ async function loadJobs(){
 }
 
 async function saveJob(){
+  const btn=document.querySelector('.save-btn');
+  if(btn.disabled)return;
+  btn.disabled=true;btn.textContent='Saving...';
   const name=document.getElementById('fName').value.trim();
   const cat=document.getElementById('fCat').value;
   const person=document.getElementById('fPerson').value;
@@ -188,8 +191,8 @@ async function saveJob(){
   const end=document.getElementById('fEnd').value;
   const notes=document.getElementById('fNotes').value.trim()||null;
   const seqf=document.getElementById('fSeqf').value.trim()||null;
-  if(!name||!start||!end){alert('Please fill in all fields.');return;}
-  if(start>end){alert('End date must be on or after start date.');return;}
+  if(!name||!start||!end){btn.disabled=false;btn.textContent='Save';alert('Please fill in all fields.');return;}
+  if(start>end){btn.disabled=false;btn.textContent='Save';alert('End date must be on or after start date.');return;}
   if(editingId){
     await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes,seqf}).eq('id',editingId);
   } else {
