@@ -113,6 +113,7 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a}
     <div class="field"><label>Assigned to</label><select id="fPerson"></select></div>
     <div class="field"><label>Start date</label><input type="date" id="fStart"></div>
     <div class="field"><label>End date</label><input type="date" id="fEnd"></div>
+    <div class="field"><label>Project manager <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="fPm" placeholder="e.g. Jane Smith"></div>
     <div class="field"><label>Notes <span style="color:#aaa;font-weight:400">(optional)</span></label><textarea id="fNotes" rows="3" placeholder="e.g. Bring spare cables, client contact is John..."></textarea></div>
     <div class="modal-btns">
       <button id="delBtn" class="del-btn" style="display:none;margin-right:auto" onclick="deleteJob()">Delete</button>
@@ -165,7 +166,7 @@ sb.auth.onAuthStateChange((e,s)=>{if(s)showApp();});
 // --- Data ---
 async function loadJobs(){
   const{data,error}=await sb.from('jobs').select('*').order('start_date');
-  if(!error)jobs=data.map(j=>({id:j.id,name:j.name,cat:j.cat,person:j.person,start:j.start_date,end:j.end_date,notes:j.notes,seqf:j.seqf}));
+  if(!error)jobs=data.map(j=>({id:j.id,name:j.name,cat:j.cat,person:j.person,start:j.start_date,end:j.end_date,notes:j.notes,seqf:j.seqf,pm:j.pm}));
 }
 
 // --- Modal ---
@@ -186,6 +187,7 @@ function openAddModal(){
   document.getElementById('modalTitle').textContent='Add job';
   document.getElementById('fName').value='';
   document.getElementById('fSeqf').value='';
+  document.getElementById('fPm').value='';
   document.getElementById('fNotes').value='';
   buildCatSelect(CATEGORIES[0].id);
   buildPersonSelect(PEOPLE[0]);
@@ -208,6 +210,7 @@ function openEditModal(id){
   document.getElementById('modalTitle').textContent='Edit job';
   document.getElementById('fName').value=j.name;
   document.getElementById('fSeqf').value=j.seqf||'';
+  document.getElementById('fPm').value=j.pm||'';
   document.getElementById('fNotes').value=j.notes||'';
   buildCatSelect(j.cat||CATEGORIES[0].id);
   buildPersonSelect(j.person);
@@ -229,14 +232,15 @@ async function saveJob(){
   const start=document.getElementById('fStart').value;
   const end=document.getElementById('fEnd').value;
   const notes=document.getElementById('fNotes').value.trim()||null;
+  const pm=document.getElementById('fPm').value.trim()||null;
   if(!name||!start||!end){alert('Please fill in all fields.');return;}
   if(start>end){alert('End date must be on or after start date.');return;}
   btn.disabled=true;btn.textContent='Saving...';
   closeModal();
   if(editingId){
-    await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes,seqf}).eq('id',editingId);
+    await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes,seqf,pm}).eq('id',editingId);
   } else {
-    await sb.from('jobs').insert({name,cat,person,start_date:start,end_date:end,notes,seqf});
+    await sb.from('jobs').insert({name,cat,person,start_date:start,end_date:end,notes,seqf,pm});
   }
   await loadJobs();
   render();
@@ -352,6 +356,7 @@ function onSearch(){
     j.name.toLowerCase().includes(q)||
     j.person.toLowerCase().includes(q)||
     (j.seqf&&j.seqf.toLowerCase().includes(q))||
+    (j.pm&&j.pm.toLowerCase().includes(q))||
     (j.notes&&j.notes.toLowerCase().includes(q))
   );
   if(!matches.length){dd.innerHTML='<div style="padding:10px 12px;font-size:13px;color:#888">No jobs found</div>';dd.style.display='block';return;}
@@ -361,7 +366,7 @@ function onSearch(){
       <span style="width:8px;height:8px;border-radius:2px;background:${cat.color};flex-shrink:0"></span>
       <div>
         <div style="font-size:13px;font-weight:500">${j.name}${j.seqf?` <span style="font-size:11px;color:#888;font-weight:400">${j.seqf}</span>`:''}</div>
-        <div style="font-size:11px;color:#888">${j.person} &middot; ${j.start} to ${j.end}</div>
+        <div style="font-size:11px;color:#888">${j.person}${j.pm?' &middot; PM: '+j.pm:''} &middot; ${j.start} to ${j.end}</div>
       </div>
     </div>`;
   }).join('');
