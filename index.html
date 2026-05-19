@@ -140,7 +140,7 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a;overflow-x:h
     <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
     <span class="month-label" id="monthLabel"></span>
     <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
-    <button class="add-btn" onclick="openAddModal()">+ Add job</button>
+    <button id="addJobBtn" class="add-btn" onclick="openAddModal()">+ Add job</button>
     <div class="search-wrap">
       <span class="search-icon">&#128269;</span>
       <input type="text" id="searchInput" placeholder="Search jobs..." oninput="onSearch()">
@@ -217,6 +217,7 @@ let curYear=new Date().getFullYear();
 let curMonth=new Date().getMonth()+1;
 let selectedDate=fmt(new Date());
 let editingId=null;
+let isAdmin=false;
 
 // Touch swipe
 let touchStartX=0;
@@ -243,6 +244,10 @@ async function signOut(){
 async function showApp(){
   document.getElementById('authScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
+  const{data:{user}}=await sb.auth.getUser();
+  isAdmin=user?.user_metadata?.role==='admin';
+  // Show/hide admin controls
+  document.getElementById('addJobBtn').style.display=isAdmin?'':'none';
   await loadJobs();
   render();
 }
@@ -400,7 +405,7 @@ function renderDesktop(){
         bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
         bar.style.borderLeft=`2px solid ${cat.color}`;
         bar.textContent=(j.seqf?j.seqf+' - ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠ Unassigned':j.person)+')';
-        bar.addEventListener('click',e=>{e.stopPropagation();openEditModal(j.id);});
+        bar.addEventListener('click',e=>{e.stopPropagation();if(isAdmin)openEditModal(j.id);});
         td.appendChild(bar);
       });
       tr.appendChild(td);
@@ -435,8 +440,7 @@ function renderMobileGrid(){
       });
       div.appendChild(dots);
     }
-    div.addEventListener('click',()=>{selectedDate=cell.date;renderMobileGrid();renderDayPanel();});
-    grid.appendChild(div);
+    div.addEventListener('click',()=>{selectedDate=cell.date;renderMobileGrid();renderDayPanel();});    grid.appendChild(div);
   });
 }
 
@@ -446,6 +450,7 @@ function renderDayPanel(){
   const label=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('dayPanelTitle').textContent=label;
   const addBtn=document.getElementById('dayPanelAdd');
+  addBtn.style.display=isAdmin?'':'none';
   addBtn.onclick=()=>openAddModalDate(selectedDate);
   const container=document.getElementById('dayPanelJobs');
   container.innerHTML='';
@@ -466,7 +471,7 @@ function renderDayPanel(){
         ${j.pm?`<span>📋 PM: ${j.pm}</span>`:''}
         <span>📅 ${j.start} – ${j.end}</span>
       </div>`;
-    card.addEventListener('click',()=>openEditModal(j.id));
+    card.addEventListener('click',()=>{if(isAdmin)openEditModal(j.id);});
     container.appendChild(card);
   });
 }
