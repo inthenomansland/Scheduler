@@ -3,205 +3,290 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Team Scheduler</title>
+<title>ProAV Scheduler</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --green:#6ABF2E;
+  --green-dark:#52a01e;
+  --black:#111111;
+  --grey-900:#1a1a1a;
+  --grey-700:#444;
+  --grey-400:#999;
+  --grey-200:#e5e5e5;
+  --grey-100:#f5f5f5;
+  --white:#ffffff;
+  --red:#E24B4A;
+  --radius:10px;
+  --shadow:0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a;overflow-x:hidden}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:var(--grey-900);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── Logo ── */
+.logo{display:flex;align-items:center;gap:2px;font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1}
+.logo span.pro{color:var(--black)}
+.logo span.av{color:var(--green)}
+.logo sup{font-size:9px;color:var(--grey-400);font-weight:500;margin-left:1px;align-self:flex-start;margin-top:3px}
 
 /* ── Auth ── */
-#authScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f5f5f5;padding:1rem}
-.auth-card{background:#fff;border-radius:12px;border:1px solid #e5e5e5;padding:2rem;width:100%;max-width:360px}
-.auth-card h2{font-size:18px;font-weight:500;margin-bottom:1.5rem;text-align:center}
-.auth-card .err{font-size:13px;color:#E24B4A;margin-top:8px;min-height:18px}
-.auth-card button{width:100%;margin-top:12px;padding:10px;background:#378ADD;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:500}
-.auth-card button:hover{background:#185FA5}
+#authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--black);padding:1.5rem;gap:2rem}
+.auth-logo{display:flex;align-items:center;gap:3px;font-size:36px;font-weight:700;letter-spacing:-1px}
+.auth-logo span.pro{color:var(--white)}
+.auth-logo span.av{color:var(--green)}
+.auth-logo sup{font-size:13px;color:var(--grey-400);font-weight:500;margin-left:2px;align-self:flex-start;margin-top:5px}
+.auth-sub{font-size:14px;color:var(--grey-400);letter-spacing:0.05em;text-transform:uppercase;font-weight:500;margin-top:-12px}
+.auth-card{background:var(--grey-900);border-radius:16px;border:1px solid #2a2a2a;padding:2rem;width:100%;max-width:360px}
+.auth-card .field{margin-bottom:14px}
+.auth-card label{font-size:12px;font-weight:600;color:var(--grey-400);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em}
+.auth-card input{width:100%;font-size:15px;padding:11px 14px;background:#222;border:1px solid #333;border-radius:var(--radius);outline:none;color:var(--white);font-family:inherit}
+.auth-card input:focus{border-color:var(--green)}
+.auth-card input::placeholder{color:#555}
+.auth-err{font-size:13px;color:var(--red);margin-top:6px;min-height:18px}
+.auth-btn{width:100%;margin-top:8px;padding:12px;background:var(--green);color:var(--white);border:none;border-radius:var(--radius);font-size:15px;cursor:pointer;font-weight:600;font-family:inherit;transition:background 0.15s}
+.auth-btn:hover{background:var(--green-dark)}
 
-/* ── App ── */
-#appScreen{display:none;padding:0.75rem 1rem 3rem}
+/* ── App shell ── */
+#appScreen{display:none;min-height:100vh}
 
-/* ── Toolbar ── */
-.toolbar{display:flex;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap}
-.toolbar h2{font-size:17px;font-weight:600;flex:1;min-width:120px}
-.nav-btn{background:none;border:1px solid #ddd;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:15px}
-.nav-btn:hover{background:#f5f5f5}
-.month-label{font-size:15px;font-weight:500;min-width:120px;text-align:center}
-.add-btn{background:#378ADD;color:#fff;border:none;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:14px;font-weight:500;white-space:nowrap}
-.add-btn:hover{background:#185FA5}
-.signout-btn{background:none;border:1px solid #ddd;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:#888}
-.signout-btn:hover{background:#f5f5f5}
-.search-wrap{position:relative;flex:1;min-width:140px;max-width:220px}
-.search-wrap input{font-size:14px;padding:6px 10px 6px 30px;border:1px solid #ddd;border-radius:8px;outline:none;width:100%}
-.search-wrap input:focus{border-color:#378ADD}
-.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#aaa;font-size:13px;pointer-events:none}
-#searchDropdown{display:none;position:absolute;top:38px;left:0;width:300px;max-width:90vw;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:500;max-height:260px;overflow-y:auto}
+/* ── Top bar ── */
+.topbar{background:var(--black);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-divider{width:1px;height:20px;background:#333}
+.scheduler-label{font-size:12px;font-weight:500;color:var(--grey-400);letter-spacing:0.08em;text-transform:uppercase}
+
+/* ── Main content ── */
+.main{padding:1.25rem 1.5rem 3rem}
+
+/* ── Calendar toolbar ── */
+.cal-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+.cal-toolbar-left{display:flex;align-items:center;gap:8px;flex:1}
+.month-display{font-size:18px;font-weight:600;color:var(--black);min-width:160px}
+.nav-btn{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--grey-700);transition:all 0.15s;flex-shrink:0}
+.nav-btn:hover{border-color:var(--green);color:var(--green)}
+.cal-toolbar-right{display:flex;align-items:center;gap:8px}
+.btn-primary{background:var(--green);color:var(--white);border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s;display:flex;align-items:center;gap:5px}
+.btn-primary:hover{background:var(--green-dark)}
+.btn-ghost{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--grey-700);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s}
+.btn-ghost:hover{border-color:var(--grey-400)}
+
+/* ── Search ── */
+.search-wrap{position:relative;min-width:160px;max-width:220px;flex:1}
+.search-wrap input{width:100%;font-size:13px;padding:7px 10px 7px 32px;border:1px solid var(--grey-200);border-radius:8px;outline:none;background:var(--white);font-family:inherit;color:var(--grey-900)}
+.search-wrap input:focus{border-color:var(--green)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--grey-400);font-size:13px;pointer-events:none}
+#searchDropdown{display:none;position:absolute;top:38px;left:0;width:310px;max-width:90vw;background:var(--white);border:1px solid var(--grey-200);border-radius:12px;box-shadow:var(--shadow-lg);z-index:500;max-height:280px;overflow-y:auto}
 
 /* ── Legend ── */
-.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:0.75rem}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#555}
-.legend-swatch{width:11px;height:11px;border-radius:2px;flex-shrink:0}
-.cat-note{font-size:10px;color:#aaa;margin-left:2px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:1rem}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey-700);font-weight:500}
+.legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.cat-note{font-size:10px;color:var(--grey-400);font-weight:400}
 
 /* ── Desktop calendar ── */
+.cal-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
 .cal-desktop{width:100%;border-collapse:collapse}
-.cal-desktop th{font-size:12px;color:#666;padding:4px 6px;text-align:left;border-bottom:1px solid #eee;font-weight:500}
-.cal-desktop td{vertical-align:top;border:1px solid #eee;padding:4px;height:90px;width:calc(100%/7);cursor:pointer}
-.cal-desktop td:hover{background:#fafafa}
-.day-num{font-size:12px;color:#888;margin-bottom:2px}
-.day-num.today{background:#378ADD;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-weight:500}
-.day-num.other-month{color:#ccc}
-.job-bar{font-size:10px;border-radius:3px;padding:1px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cal-desktop th{font-size:11px;color:var(--grey-400);padding:10px 8px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--white)}
+.cal-desktop td{vertical-align:top;border-right:1px solid var(--grey-200);border-bottom:1px solid var(--grey-200);padding:6px;height:96px;width:calc(100%/7);cursor:pointer;transition:background 0.1s}
+.cal-desktop td:last-child{border-right:none}
+.cal-desktop tr:last-child td{border-bottom:none}
+.cal-desktop td:hover{background:#f9fff5}
+.day-num{font-size:12px;font-weight:500;color:var(--grey-400);margin-bottom:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.day-num.today{background:var(--green);color:var(--white);font-weight:700}
+.day-num.other-month{color:var(--grey-200)}
+.job-bar{font-size:10px;font-weight:500;border-radius:5px;padding:2px 6px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:opacity 0.1s}
+.job-bar:hover{opacity:0.8}
 
 /* ── Mobile calendar ── */
-.cal-mobile{display:none;user-select:none}
-.cal-mobile-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
-.cal-mobile-header span{text-align:center;font-size:11px;font-weight:600;color:#aaa;padding:4px 0;text-transform:uppercase}
-.cal-mobile-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-mobile-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;position:relative;flex-direction:column;gap:2px}
-.cal-mobile-cell .cnum{font-size:15px;font-weight:400;color:#1a1a1a;line-height:1}
-.cal-mobile-cell.other-month .cnum{color:#ccc}
-.cal-mobile-cell.today .cnum{background:#378ADD;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.cal-mobile-cell.selected .cnum{background:#1a1a1a;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.cal-mobile-cell.selected.today .cnum{background:#378ADD}
-.cal-mobile-cell.team-full{outline:2px solid #E24B4A;border-radius:6px}
-.cal-mobile-dots{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;max-width:28px}
-.cal-mobile-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.cal-mobile{display:none}
+.cal-mobile-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow);padding:12px}
+.cal-mobile-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.cal-mobile-header span{text-align:center;font-size:10px;font-weight:700;color:var(--grey-400);padding:4px 0;text-transform:uppercase;letter-spacing:0.06em}
+.cal-mobile-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-mobile-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;position:relative;flex-direction:column;gap:3px}
+.cnum{font-size:14px;font-weight:500;color:var(--grey-900);line-height:1}
+.cal-mobile-cell.other-month .cnum{color:var(--grey-200)}
+.cal-mobile-cell.today .cnum{background:var(--green);color:var(--white);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.cal-mobile-cell.selected{background:#f0fbe6}
+.cal-mobile-cell.selected .cnum{color:var(--green);font-weight:700}
+.cal-mobile-cell.selected.today .cnum{background:var(--green);color:var(--white)}
+.cal-mobile-cell.team-full{outline:2px solid var(--red);border-radius:8px}
+.cal-mobile-dots{display:flex;gap:2px;justify-content:center}
+.cal-mobile-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
 
-/* ── Day panel (mobile) ── */
-.day-panel{display:none;margin-top:12px;border-top:1px solid #eee;padding-top:12px}
-.day-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.day-panel-title{font-size:15px;font-weight:600;color:#1a1a1a}
-.day-panel-add{background:#378ADD;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer}
-.day-panel-empty{font-size:14px;color:#aaa;padding:12px 0;text-align:center}
-.day-card{background:#f9f9f9;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;border-left:4px solid #ddd;active:background:#f0f0f0}
-.day-card:active{background:#f0f0f0}
-.day-card-title{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:3px}
-.day-card-meta{font-size:12px;color:#888;display:flex;flex-wrap:wrap;gap:6px}
-.day-card-meta span{display:flex;align-items:center;gap:3px}
+/* ── Day panel ── */
+.day-panel{display:none;margin-top:12px}
+.day-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
+.day-panel-title{font-size:15px;font-weight:600;color:var(--black)}
+.day-panel-empty{font-size:14px;color:var(--grey-400);padding:20px 0;text-align:center}
+.day-card{background:var(--white);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;border:1px solid var(--grey-200);border-left:4px solid var(--grey-200);box-shadow:var(--shadow);transition:box-shadow 0.15s}
+.day-card:active{box-shadow:none}
+.day-card-title{font-size:14px;font-weight:600;color:var(--black);margin-bottom:5px}
+.day-card-meta{font-size:12px;color:var(--grey-400);display:flex;flex-wrap:wrap;gap:8px}
 
 /* ── Conflict panel ── */
-.conflict-panel{background:#f9f9f9;border:1px solid #eee;border-radius:12px;padding:1rem;margin-top:1rem}
-.conflict-panel h3{font-size:14px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.conflict-item{font-size:13px;color:#555;padding:5px 0;border-bottom:1px solid #eee}
+.conflict-panel{background:var(--white);border:1px solid var(--grey-200);border-radius:14px;padding:1.1rem 1.25rem;margin-top:1rem;box-shadow:var(--shadow)}
+.conflict-panel h3{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;color:var(--black);text-transform:uppercase;letter-spacing:0.05em}
+.conflict-item{font-size:13px;color:var(--grey-700);padding:6px 0;border-bottom:1px solid var(--grey-100)}
 .conflict-item:last-child{border-bottom:none}
-.no-conflicts{font-size:13px;color:#888;font-style:italic}
+.no-conflicts{font-size:13px;color:var(--grey-400);font-style:italic}
 
 /* ── Modal ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .modal-overlay.open{display:flex}
-.modal-box{background:#fff;border-radius:12px;padding:1.5rem;width:410px;max-width:96vw;max-height:92vh;overflow-y:auto}
-.modal-box h3{font-size:16px;font-weight:500;margin-bottom:1rem}
-.field{margin-bottom:12px}
-.field label{font-size:13px;color:#666;display:block;margin-bottom:4px}
-.field input,.field select,.field textarea{width:100%;font-size:14px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:#378ADD}
+.modal-box{background:var(--white);border-radius:16px;padding:1.75rem;width:430px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-box h3{font-size:17px;font-weight:700;margin-bottom:1.25rem;color:var(--black)}
+.field{margin-bottom:14px}
+.field label{font-size:11px;font-weight:700;color:var(--grey-400);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em}
+.field input,.field select,.field textarea{width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--grey-200);border-radius:var(--radius);outline:none;font-family:inherit;color:var(--grey-900);background:var(--white);transition:border-color 0.15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green)}
 .field textarea{resize:vertical}
-.modal-btns{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
-.modal-btns button{font-size:14px;padding:8px 18px;border-radius:8px;cursor:pointer;border:1px solid #ddd;background:#fff}
-.modal-btns button:hover{background:#f5f5f5}
-.modal-btns .save-btn{background:#378ADD;color:#fff;border-color:#378ADD}
-.modal-btns .save-btn:hover{background:#185FA5}
-.modal-btns .save-btn:disabled{background:#aaa;border-color:#aaa;cursor:not-allowed}
-.modal-btns .del-btn{color:#E24B4A;border-color:#E24B4A}
+.modal-btns{display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end}
+.modal-btns button{font-size:14px;padding:9px 20px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--grey-200);background:var(--white);font-family:inherit;font-weight:500;transition:all 0.15s}
+.modal-btns button:hover{background:var(--grey-100)}
+.modal-btns .save-btn{background:var(--green);color:var(--white);border-color:var(--green);font-weight:600}
+.modal-btns .save-btn:hover{background:var(--green-dark)}
+.modal-btns .save-btn:disabled{background:var(--grey-200);border-color:var(--grey-200);color:var(--grey-400);cursor:not-allowed}
+.modal-btns .del-btn{color:var(--red);border-color:#fdd;background:#fff}
 .modal-btns .del-btn:hover{background:#fff5f5}
+
+/* ── View modal ── */
+.view-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid var(--grey-100)}
+.view-row:last-child{border-bottom:none}
+.view-label{font-size:11px;font-weight:700;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.07em}
+.view-value{font-size:14px;color:var(--grey-900);font-weight:500}
+.notes-box{margin-top:4px;padding:10px 12px;background:var(--grey-100);border-radius:8px;font-size:13px;color:var(--grey-700);line-height:1.6}
+
+/* ── Team full indicator ── */
+.team-full-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--red);background:#fff0f0;border:1px solid #fdd;border-radius:4px;padding:1px 5px;margin-left:4px}
 
 /* ── Mobile overrides ── */
 @media(max-width:768px){
-  #appScreen{padding:0.5rem 0.75rem 4rem}
-  .toolbar{gap:6px}
-  .toolbar h2{font-size:16px}
+  .topbar{padding:0 1rem;height:52px}
+  .scheduler-label{display:none}
+  .topbar-divider{display:none}
+  .main{padding:1rem 0.875rem 4rem}
+  .cal-toolbar{gap:8px;margin-bottom:0.875rem}
+  .month-display{font-size:16px;min-width:130px}
   .search-wrap{max-width:100%;order:5;flex-basis:100%}
   .cal-desktop{display:none}
   .cal-mobile{display:block}
   .day-panel{display:block}
   .modal-overlay{align-items:flex-end}
-  .modal-box{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:1.25rem 1rem 2rem}
-  .modal-box h3{font-size:17px}
-  .field input,.field select,.field textarea{font-size:16px;padding:10px 12px}
-  .modal-btns button{padding:10px 18px;font-size:15px}
+  .modal-box{border-radius:20px 20px 0 0;width:100%;max-width:100%;padding:1.5rem 1.25rem 2.5rem}
+  .field input,.field select,.field textarea{font-size:16px;padding:11px 13px}
+  .modal-btns button{padding:11px 20px;font-size:15px}
 }
 </style>
 </head>
 <body>
 
+<!-- Auth -->
 <div id="authScreen">
+  <div style="text-align:center">
+    <div class="auth-logo"><span class="pro">pro</span><span class="av">AV</span><sup>®</sup></div>
+    <div class="auth-sub">Team Scheduler</div>
+  </div>
   <div class="auth-card">
-    <h2>Team Scheduler</h2>
-    <div class="field"><label>Email</label><input type="email" id="authEmail" placeholder="you@example.com"></div>
-    <div class="field"><label>Password</label><input type="password" id="authPass" placeholder="Password" onkeydown="if(event.key==='Enter')signIn()"></div>
-    <div class="err" id="authErr"></div>
-    <button onclick="signIn()">Sign in</button>
+    <div class="field"><label>Email</label><input type="email" id="authEmail" placeholder="you@proav.com"></div>
+    <div class="field"><label>Password</label><input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')signIn()"></div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="auth-btn" onclick="signIn()">Sign in</button>
   </div>
 </div>
 
+<!-- App -->
 <div id="appScreen">
-  <div class="toolbar">
-    <h2>Team Scheduler</h2>
-    <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
-    <span class="month-label" id="monthLabel"></span>
-    <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
-    <button id="addJobBtn" class="add-btn" onclick="openAddModal()">+ Add job</button>
-    <div class="search-wrap">
-      <span class="search-icon">&#128269;</span>
-      <input type="text" id="searchInput" placeholder="Search jobs..." oninput="onSearch()">
-      <div id="searchDropdown"></div>
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo"><span class="pro">pro</span><span class="av">AV</span><sup>®</sup></div>
+      <div class="topbar-divider"></div>
+      <div class="scheduler-label">Team Scheduler</div>
     </div>
-    <button class="signout-btn" onclick="signOut()">Sign out</button>
-  </div>
-  <div class="legend" id="legend"></div>
-
-  <!-- Desktop -->
-  <table class="cal-desktop">
-    <thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
-    <tbody id="calBody"></tbody>
-  </table>
-
-  <!-- Mobile -->
-  <div class="cal-mobile" id="calMobile">
-    <div class="cal-mobile-header">
-      <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+    <div class="topbar-right">
+      <button class="btn-ghost" onclick="signOut()" style="font-size:12px;padding:6px 12px">Sign out</button>
     </div>
-    <div class="cal-mobile-grid" id="calMobileGrid"></div>
   </div>
 
-  <!-- Day panel (mobile) -->
-  <div class="day-panel" id="dayPanel">
-    <div class="day-panel-header">
-      <span class="day-panel-title" id="dayPanelTitle">Select a day</span>
-      <button class="day-panel-add" id="dayPanelAdd">+ Add job</button>
+  <div class="main">
+    <div class="cal-toolbar">
+      <div class="cal-toolbar-left">
+        <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
+        <span class="month-display" id="monthLabel"></span>
+        <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
+      </div>
+      <div class="cal-toolbar-right">
+        <div class="search-wrap">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" id="searchInput" placeholder="Search jobs, SEQF, PM..." oninput="onSearch()">
+          <div id="searchDropdown"></div>
+        </div>
+        <button id="addJobBtn" class="btn-primary" onclick="openAddModal()">&#＋; Add job</button>
+      </div>
     </div>
-    <div id="dayPanelJobs"></div>
-  </div>
 
-  <div class="conflict-panel">
-    <h3>&#9888; Double assignments <span id="conflictCount" style="font-size:12px;padding:2px 8px;border-radius:12px;font-weight:400"></span></h3>
-    <div id="conflictList"></div>
+    <div class="legend" id="legend"></div>
+
+    <!-- Desktop calendar -->
+    <div class="cal-wrap">
+      <table class="cal-desktop">
+        <thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
+        <tbody id="calBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Mobile calendar -->
+    <div class="cal-mobile" id="calMobile">
+      <div class="cal-mobile-wrap">
+        <div class="cal-mobile-header">
+          <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+        </div>
+        <div class="cal-mobile-grid" id="calMobileGrid"></div>
+      </div>
+      <div class="day-panel" id="dayPanel">
+        <div class="day-panel-header">
+          <span class="day-panel-title" id="dayPanelTitle"></span>
+          <button id="dayPanelAdd" class="btn-primary" style="font-size:12px;padding:6px 12px">+ Add job</button>
+        </div>
+        <div id="dayPanelJobs"></div>
+      </div>
+    </div>
+
+    <div class="conflict-panel">
+      <h3>&#9888; Double assignments <span id="conflictCount" style="font-size:11px;padding:2px 10px;border-radius:20px;font-weight:600;text-transform:none;letter-spacing:0"></span></h3>
+      <div id="conflictList"></div>
+    </div>
   </div>
 </div>
 
+<!-- View modal -->
 <div class="modal-overlay" id="viewOverlay">
   <div class="modal-box">
-    <h3 id="viewTitle">Job details</h3>
-    <div id="viewBody" style="font-size:14px;line-height:1.8;color:#333"></div>
-    <div class="modal-btns" style="margin-top:1.25rem">
-      <button id="viewCloseBtn">Close</button>
-    </div>
+    <h3 id="viewTitle"></h3>
+    <div id="viewBody"></div>
+    <div class="modal-btns"><button id="viewCloseBtn">Close</button></div>
   </div>
 </div>
 
+<!-- Edit modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box">
     <h3 id="modalTitle">Add job</h3>
     <div class="field"><label>Job name</label><input type="text" id="fName" placeholder="e.g. AV install – Main Hall"></div>
-    <div class="field"><label>SEQF number <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="fSeqf" placeholder="e.g. SEQF-1234"></div>
+    <div class="field"><label>SEQF number <span style="color:var(--grey-400);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="fSeqf" placeholder="e.g. SEQF-1234"></div>
     <div class="field"><label>Category</label><select id="fCat"></select></div>
     <div class="field"><label>Assigned to</label><select id="fPerson"></select></div>
-    <div class="field"><label>Project manager <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="fPm" placeholder="e.g. Jane Smith"></div>
+    <div class="field"><label>Project manager <span style="color:var(--grey-400);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="fPm" placeholder="e.g. Jane Smith"></div>
     <div class="field"><label>Start date</label><input type="date" id="fStart"></div>
     <div class="field"><label>End date</label><input type="date" id="fEnd"></div>
-    <div class="field"><label>Notes <span style="color:#aaa;font-weight:400">(optional)</span></label><textarea id="fNotes" rows="3" placeholder="e.g. Bring spare cables, client contact is John..."></textarea></div>
+    <div class="field"><label>Notes <span style="color:var(--grey-400);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><textarea id="fNotes" rows="3" placeholder="e.g. Bring spare cables, client contact is John..."></textarea></div>
     <div class="modal-btns">
-      <button id="delBtn" class="del-btn" style="display:none;margin-right:auto" onclick="deleteJob()">Delete</button>
+      <button id="delBtn" class="del-btn" style="display:none;margin-right:auto">Delete</button>
       <button id="cancelBtn">Cancel</button>
       <button id="saveBtn" class="save-btn">Save</button>
     </div>
@@ -222,20 +307,13 @@ const CATEGORIES=[
 ];
 function getCat(id){return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]}
 
-let jobs=[];
-let curYear=new Date().getFullYear();
-let curMonth=new Date().getMonth()+1;
-let selectedDate=fmt(new Date());
-let editingId=null;
-let isAdmin=false;
+let jobs=[], curYear=new Date().getFullYear(), curMonth=new Date().getMonth()+1;
+let selectedDate=fmt(new Date()), editingId=null, isAdmin=false;
 
-// Touch swipe
-let touchStartX=0;
-document.getElementById('calMobile').addEventListener('touchstart',e=>touchStartX=e.touches[0].clientX,{passive:true});
-document.getElementById('calMobile').addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-touchStartX;
-  if(Math.abs(dx)>50){changeMonth(dx<0?1:-1);}
-},{passive:true});
+// Swipe
+let txStart=0;
+document.getElementById('calMobile').addEventListener('touchstart',e=>txStart=e.touches[0].clientX,{passive:true});
+document.getElementById('calMobile').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-txStart;if(Math.abs(dx)>50)changeMonth(dx<0?1:-1);},{passive:true});
 
 // Auth
 async function signIn(){
@@ -246,20 +324,14 @@ async function signIn(){
   if(error){document.getElementById('authErr').textContent=error.message;return;}
   showApp();
 }
-async function signOut(){
-  await sb.auth.signOut();
-  document.getElementById('appScreen').style.display='none';
-  document.getElementById('authScreen').style.display='flex';
-}
+async function signOut(){await sb.auth.signOut();document.getElementById('appScreen').style.display='none';document.getElementById('authScreen').style.display='flex';}
 async function showApp(){
   document.getElementById('authScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
   const{data:{user}}=await sb.auth.getUser();
   isAdmin=user?.user_metadata?.role==='admin';
-  // Show/hide admin controls
   document.getElementById('addJobBtn').style.display=isAdmin?'':'none';
-  await loadJobs();
-  render();
+  await loadJobs();render();
 }
 sb.auth.onAuthStateChange((e,s)=>{if(s)showApp();});
 
@@ -269,75 +341,55 @@ async function loadJobs(){
   if(!error)jobs=data.map(j=>({id:j.id,name:j.name,cat:j.cat,person:j.person,start:j.start_date,end:j.end_date,notes:j.notes,seqf:j.seqf,pm:j.pm}));
 }
 
-// Modal
+// Modals
 function openModal(){document.getElementById('modalOverlay').classList.add('open')}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
-document.getElementById('viewCloseBtn').addEventListener('click',()=>document.getElementById('viewOverlay').classList.remove('open'));
-document.getElementById('viewOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
-
-function openViewModal(id){
-  const j=jobs.find(x=>x.id===id);
-  const cat=getCat(j.cat);
-  document.getElementById('viewTitle').textContent=j.name;
-  document.getElementById('viewBody').innerHTML=`
-    ${j.seqf?`<div><strong>SEQF:</strong> ${j.seqf}</div>`:''}
-    <div><strong>Category:</strong> <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${cat.color};margin-right:4px;vertical-align:middle"></span>${cat.label}</div>
-    <div><strong>Assigned to:</strong> ${j.person}</div>
-    ${j.pm?`<div><strong>Project manager:</strong> ${j.pm}</div>`:''}
-    <div><strong>Start:</strong> ${j.start}</div>
-    <div><strong>End:</strong> ${j.end}</div>
-    ${j.notes?`<div style="margin-top:8px;padding:8px 10px;background:#f9f9f9;border-radius:8px;border-left:3px solid #ddd"><strong>Notes:</strong><br>${j.notes}</div>`:''}
-  `;
-  document.getElementById('viewOverlay').classList.add('open');
-}
-
-
+document.getElementById('cancelBtn').addEventListener('click',e=>{e.stopPropagation();closeModal();});
 document.getElementById('saveBtn').addEventListener('click',saveJob);
 document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('viewCloseBtn').addEventListener('click',()=>document.getElementById('viewOverlay').classList.remove('open'));
+document.getElementById('viewOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 
 function openAddModal(){
   editingId=null;
   document.getElementById('modalTitle').textContent='Add job';
-  document.getElementById('fName').value='';
-  document.getElementById('fSeqf').value='';
-  document.getElementById('fPm').value='';
-  document.getElementById('fNotes').value='';
-  buildCatSelect(CATEGORIES[0].id);
-  buildPersonSelect(PEOPLE[0]);
+  document.getElementById('fName').value='';document.getElementById('fSeqf').value='';
+  document.getElementById('fPm').value='';document.getElementById('fNotes').value='';
+  buildCatSelect(CATEGORIES[0].id);buildPersonSelect(PEOPLE[0]);
   const t=fmt(new Date());
-  document.getElementById('fStart').value=t;
-  document.getElementById('fEnd').value=t;
+  document.getElementById('fStart').value=t;document.getElementById('fEnd').value=t;
   document.getElementById('delBtn').style.display='none';
-  document.getElementById('saveBtn').disabled=false;
-  document.getElementById('saveBtn').textContent='Save';
+  document.getElementById('saveBtn').disabled=false;document.getElementById('saveBtn').textContent='Save';
   openModal();
 }
-function openAddModalDate(date){
-  openAddModal();
-  document.getElementById('fStart').value=date;
-  document.getElementById('fEnd').value=date;
-}
+function openAddModalDate(date){openAddModal();document.getElementById('fStart').value=date;document.getElementById('fEnd').value=date;}
 function openEditModal(id){
-  editingId=id;
-  const j=jobs.find(x=>x.id===id);
+  editingId=id;const j=jobs.find(x=>x.id===id);
   document.getElementById('modalTitle').textContent='Edit job';
-  document.getElementById('fName').value=j.name;
-  document.getElementById('fSeqf').value=j.seqf||'';
-  document.getElementById('fPm').value=j.pm||'';
-  document.getElementById('fNotes').value=j.notes||'';
-  buildCatSelect(j.cat||CATEGORIES[0].id);
-  buildPersonSelect(j.person);
-  document.getElementById('fStart').value=j.start;
-  document.getElementById('fEnd').value=j.end;
+  document.getElementById('fName').value=j.name;document.getElementById('fSeqf').value=j.seqf||'';
+  document.getElementById('fPm').value=j.pm||'';document.getElementById('fNotes').value=j.notes||'';
+  buildCatSelect(j.cat||CATEGORIES[0].id);buildPersonSelect(j.person);
+  document.getElementById('fStart').value=j.start;document.getElementById('fEnd').value=j.end;
   document.getElementById('delBtn').style.display='inline-block';
-  document.getElementById('saveBtn').disabled=false;
-  document.getElementById('saveBtn').textContent='Save';
+  document.getElementById('saveBtn').disabled=false;document.getElementById('saveBtn').textContent='Save';
   openModal();
+}
+function openViewModal(id){
+  const j=jobs.find(x=>x.id===id);const cat=getCat(j.cat);
+  document.getElementById('viewTitle').textContent=j.name;
+  document.getElementById('viewBody').innerHTML=`
+    ${j.seqf?`<div class="view-row"><div class="view-label">SEQF</div><div class="view-value">${j.seqf}</div></div>`:''}
+    <div class="view-row"><div class="view-label">Category</div><div class="view-value" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:${cat.color};display:inline-block"></span>${cat.label}</div></div>
+    <div class="view-row"><div class="view-label">Assigned to</div><div class="view-value">${j.person}</div></div>
+    ${j.pm?`<div class="view-row"><div class="view-label">Project manager</div><div class="view-value">${j.pm}</div></div>`:''}
+    <div class="view-row"><div class="view-label">Dates</div><div class="view-value">${j.start} – ${j.end}</div></div>
+    ${j.notes?`<div class="view-row"><div class="view-label">Notes</div><div class="notes-box">${j.notes}</div></div>`:''}
+  `;
+  document.getElementById('viewOverlay').classList.add('open');
 }
 
 async function saveJob(){
-  const btn=document.getElementById('saveBtn');
-  if(btn.disabled)return;
+  const btn=document.getElementById('saveBtn');if(btn.disabled)return;
   const name=document.getElementById('fName').value.trim();
   const seqf=document.getElementById('fSeqf').value.trim()||null;
   const cat=document.getElementById('fCat').value;
@@ -348,21 +400,14 @@ async function saveJob(){
   const notes=document.getElementById('fNotes').value.trim()||null;
   if(!name||!start||!end){alert('Please fill in all fields.');return;}
   if(start>end){alert('End date must be on or after start date.');return;}
-  btn.disabled=true;btn.textContent='Saving...';
-  closeModal();
-  if(editingId){
-    await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes,seqf,pm}).eq('id',editingId);
-  } else {
-    await sb.from('jobs').insert({name,cat,person,start_date:start,end_date:end,notes,seqf,pm});
-  }
+  btn.disabled=true;btn.textContent='Saving...';closeModal();
+  if(editingId){await sb.from('jobs').update({name,cat,person,start_date:start,end_date:end,notes,seqf,pm}).eq('id',editingId);}
+  else{await sb.from('jobs').insert({name,cat,person,start_date:start,end_date:end,notes,seqf,pm});}
   await loadJobs();render();
 }
-
 async function deleteJob(){
   if(!confirm('Delete this job?'))return;
-  closeModal();
-  await sb.from('jobs').delete().eq('id',editingId);
-  await loadJobs();render();
+  closeModal();await sb.from('jobs').delete().eq('id',editingId);await loadJobs();render();
 }
 
 // Helpers
@@ -370,16 +415,7 @@ function toDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d
 function fmt(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function buildCatSelect(val){document.getElementById('fCat').innerHTML=CATEGORIES.map(c=>`<option value="${c.id}"${c.id===val?' selected':''}>${c.label}</option>`).join('')}
 function buildPersonSelect(val){document.getElementById('fPerson').innerHTML=PEOPLE.map(p=>`<option${p===val?' selected':''}>${p}</option>`).join('')}
-
-function changeMonth(d){
-  curMonth+=d;
-  if(curMonth>12){curMonth=1;curYear++}
-  if(curMonth<1){curMonth=12;curYear--}
-  // keep selected date in view
-  selectedDate=fmt(new Date(curYear,curMonth-1,1));
-  render();
-}
-
+function changeMonth(d){curMonth+=d;if(curMonth>12){curMonth=1;curYear++}if(curMonth<1){curMonth=12;curYear--}selectedDate=fmt(new Date(curYear,curMonth-1,1));render();}
 function buildCells(){
   const first=new Date(curYear,curMonth-1,1);
   let dow=first.getDay();dow=dow===0?6:dow-1;
@@ -391,116 +427,82 @@ function buildCells(){
   while(cells.length%7!==0)cells.push({date:fmt(new Date(curYear,curMonth,cells.length-dim-dow+1)),other:true});
   return cells;
 }
-
-function jobsForDate(date){
-  return jobs.filter(j=>{const s=toDate(j.start),e=toDate(j.end),cd=toDate(date);return cd>=s&&cd<=e;});
-}
-function isTeamFull(dayJobs){
-  const busy=new Set(dayJobs.map(j=>j.person));
-  return CONFLICT_CHECK_PEOPLE.every(p=>busy.has(p));
-}
+function jobsForDate(date){return jobs.filter(j=>{const s=toDate(j.start),e=toDate(j.end),cd=toDate(date);return cd>=s&&cd<=e;})}
+function isTeamFull(dj){const b=new Set(dj.map(j=>j.person));return CONFLICT_CHECK_PEOPLE.every(p=>b.has(p))}
+function barLabel(j){return(j.seqf?j.seqf+' – ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠':j.person)+')'}
 
 function render(){
   document.getElementById('monthLabel').textContent=new Date(curYear,curMonth-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
-  renderDesktop();
-  renderMobileGrid();
-  renderDayPanel();
-  buildLegend();
-  renderConflicts();
+  renderDesktop();renderMobileGrid();renderDayPanel();buildLegend();renderConflicts();
 }
 
-// Desktop
 function renderDesktop(){
   const tbody=document.getElementById('calBody');tbody.innerHTML='';
   const today=fmt(new Date());
-  const cells=buildCells();
-  for(let r=0;r<cells.length/7;r++){
-    const tr=document.createElement('tr');
-    for(let c=0;c<7;c++){
-      const cell=cells[r*7+c];
-      const td=document.createElement('td');
-      const dayJobs=jobsForDate(cell.date);
-      if(isTeamFull(dayJobs))td.style.outline='2px solid #E24B4A';
-      td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
-      const dn=document.createElement('div');
-      dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
-      dn.textContent=parseInt(cell.date.split('-')[2]);
-      td.appendChild(dn);
-      dayJobs.forEach(j=>{
-        const cat=getCat(j.cat);
-        const bar=document.createElement('div');
-        bar.className='job-bar';
-        bar.style.background=cat.color+'33';
-        bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
-        bar.style.borderLeft=`2px solid ${cat.color}`;
-        bar.textContent=(j.seqf?j.seqf+' - ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠ Unassigned':j.person)+')';
-        bar.addEventListener('click',e=>{e.stopPropagation();isAdmin?openEditModal(j.id):openViewModal(j.id);});
-        td.appendChild(bar);
-      });
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
-  }
+  buildCells().forEach((cell,i)=>{
+    if(i%7===0){var tr=document.createElement('tr');tbody.appendChild(tr);}
+    const td=document.createElement('td');
+    const dj=jobsForDate(cell.date);
+    if(isTeamFull(dj))td.style.outline='2px solid var(--red)';
+    td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
+    const dn=document.createElement('div');
+    dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
+    dn.textContent=parseInt(cell.date.split('-')[2]);
+    td.appendChild(dn);
+    dj.forEach(j=>{
+      const cat=getCat(j.cat);
+      const bar=document.createElement('div');bar.className='job-bar';
+      bar.style.background=cat.color+'28';
+      bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
+      bar.style.borderLeft=`3px solid ${cat.color}`;
+      bar.textContent=barLabel(j);
+      bar.addEventListener('click',e=>{e.stopPropagation();isAdmin?openEditModal(j.id):openViewModal(j.id);});
+      td.appendChild(bar);
+    });
+    tr.appendChild(td);
+  });
 }
 
-// Mobile grid
 function renderMobileGrid(){
   const grid=document.getElementById('calMobileGrid');grid.innerHTML='';
   const today=fmt(new Date());
   buildCells().forEach(cell=>{
-    const dayJobs=jobsForDate(cell.date);
-    const full=isTeamFull(dayJobs);
+    const dj=jobsForDate(cell.date);
     const div=document.createElement('div');
-    div.className='cal-mobile-cell'+(cell.other?' other-month':'')+(cell.date===today?' today':'')+(cell.date===selectedDate?' selected':'')+(full?' team-full':'');
-    const num=document.createElement('div');
-    num.className='cnum';
-    num.textContent=parseInt(cell.date.split('-')[2]);
-    div.appendChild(num);
-    // colour dots for jobs
-    if(dayJobs.length>0){
-      const dots=document.createElement('div');
-      dots.className='cal-mobile-dots';
-      const unique=[...new Set(dayJobs.map(j=>getCat(j.cat).color))].slice(0,3);
-      unique.forEach(color=>{
-        const dot=document.createElement('div');
-        dot.className='cal-mobile-dot';
-        dot.style.background=color;
-        dots.appendChild(dot);
+    div.className='cal-mobile-cell'+(cell.other?' other-month':'')+(cell.date===today?' today':'')+(cell.date===selectedDate?' selected':'')+(isTeamFull(dj)?' team-full':'');
+    const num=document.createElement('div');num.className='cnum';num.textContent=parseInt(cell.date.split('-')[2]);div.appendChild(num);
+    if(dj.length>0){
+      const dots=document.createElement('div');dots.className='cal-mobile-dots';
+      [...new Set(dj.map(j=>getCat(j.cat).color))].slice(0,3).forEach(color=>{
+        const dot=document.createElement('div');dot.className='cal-mobile-dot';dot.style.background=color;dots.appendChild(dot);
       });
       div.appendChild(dots);
     }
-    div.addEventListener('click',()=>{selectedDate=cell.date;renderMobileGrid();renderDayPanel();});    grid.appendChild(div);
+    div.addEventListener('click',()=>{selectedDate=cell.date;renderMobileGrid();renderDayPanel();});
+    grid.appendChild(div);
   });
 }
 
-// Day panel
 function renderDayPanel(){
   const d=toDate(selectedDate);
-  const label=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-  document.getElementById('dayPanelTitle').textContent=label;
+  document.getElementById('dayPanelTitle').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   const addBtn=document.getElementById('dayPanelAdd');
   addBtn.style.display=isAdmin?'':'none';
   addBtn.onclick=()=>openAddModalDate(selectedDate);
-  const container=document.getElementById('dayPanelJobs');
-  container.innerHTML='';
-  const dayJobs=jobsForDate(selectedDate);
-  if(dayJobs.length===0){
-    container.innerHTML='<div class="day-panel-empty">No jobs scheduled</div>';
-    return;
-  }
-  dayJobs.forEach(j=>{
+  const container=document.getElementById('dayPanelJobs');container.innerHTML='';
+  const dj=jobsForDate(selectedDate);
+  if(!dj.length){container.innerHTML='<div class="day-panel-empty">No jobs scheduled</div>';return;}
+  dj.forEach(j=>{
     const cat=getCat(j.cat);
-    const card=document.createElement('div');
-    card.className='day-card';
-    card.style.borderLeftColor=cat.color;
+    const card=document.createElement('div');card.className='day-card';card.style.borderLeftColor=cat.color;
     card.innerHTML=`<div class="day-card-title">${(j.seqf?j.seqf+' — ':'')+j.name+(j.notes?' 📋':'')}</div>
       <div class="day-card-meta">
         <span>👤 ${j.person==='Unassigned'?'⚠ Unassigned':j.person}</span>
         <span>🏷 ${cat.label}</span>
-        ${j.pm?`<span>📋 PM: ${j.pm}</span>`:''}
-        <span>📅 ${j.start} – ${j.end}</span>
+        ${j.pm?`<span>PM: ${j.pm}</span>`:''}
+        <span>${j.start} – ${j.end}</span>
       </div>`;
-    card.addEventListener('click',()=>{isAdmin?openEditModal(j.id):openViewModal(j.id);});
+    card.addEventListener('click',()=>isAdmin?openEditModal(j.id):openViewModal(j.id));
     container.appendChild(card);
   });
 }
@@ -508,25 +510,20 @@ function renderDayPanel(){
 function renderConflicts(){
   const conflicts=[];
   const checkable=jobs.filter(j=>!getCat(j.cat).noConflict);
-  for(let i=0;i<checkable.length;i++){
-    for(let k=i+1;k<checkable.length;k++){
-      const a=checkable[i],b=checkable[k];
-      if(a.person!==b.person)continue;
-      const aS=toDate(a.start),aE=toDate(a.end),bS=toDate(b.start),bE=toDate(b.end);
-      if(aS<=bE&&bS<=aE){
-        const os=new Date(Math.max(aS,bS)),oe=new Date(Math.min(aE,bE));
-        conflicts.push({person:a.person,job1:a.name,job2:b.name,from:fmt(os),to:fmt(oe)});
-      }
-    }
-  }
+  for(let i=0;i<checkable.length;i++){for(let k=i+1;k<checkable.length;k++){
+    const a=checkable[i],b=checkable[k];if(a.person!==b.person)continue;
+    const aS=toDate(a.start),aE=toDate(a.end),bS=toDate(b.start),bE=toDate(b.end);
+    if(aS<=bE&&bS<=aE){const os=new Date(Math.max(aS,bS)),oe=new Date(Math.min(aE,bE));conflicts.push({person:a.person,job1:a.name,job2:b.name,from:fmt(os),to:fmt(oe)});}
+  }}
   const list=document.getElementById('conflictList');
   const count=document.getElementById('conflictCount');
   count.textContent=conflicts.length+' issue'+(conflicts.length===1?'':'s');
-  count.style.background=conflicts.length?'#FCEBEB':'#EAF3DE';
-  count.style.color=conflicts.length?'#A32D2D':'#3B6D11';
+  count.style.background=conflicts.length?'#fff0f0':'#f0fbe6';
+  count.style.color=conflicts.length?'var(--red)':'var(--green-dark)';
+  count.style.border=conflicts.length?'1px solid #fdd':'1px solid #c5e8a0';
   list.innerHTML=conflicts.length
     ?conflicts.map(c=>`<div class="conflict-item"><strong>${c.person}</strong>: <strong>${c.job1}</strong> and <strong>${c.job2}</strong> overlap ${c.from===c.to?'on '+c.from:'from '+c.from+' to '+c.to}</div>`).join('')
-    :'<p class="no-conflicts">No double assignments.</p>';
+    :'<p class="no-conflicts">No double assignments — all clear.</p>';
 }
 
 function buildLegend(){
@@ -538,55 +535,37 @@ function buildLegend(){
   });
 }
 
-// Search
 function onSearch(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const dd=document.getElementById('searchDropdown');
   if(!q){dd.style.display='none';return;}
-  const matches=jobs.filter(j=>
-    j.name.toLowerCase().includes(q)||
-    j.person.toLowerCase().includes(q)||
-    (j.seqf&&j.seqf.toLowerCase().includes(q))||
-    (j.pm&&j.pm.toLowerCase().includes(q))||
-    (j.notes&&j.notes.toLowerCase().includes(q))
-  );
-  if(!matches.length){dd.innerHTML='<div style="padding:10px 12px;font-size:13px;color:#888">No jobs found</div>';dd.style.display='block';return;}
+  const matches=jobs.filter(j=>j.name.toLowerCase().includes(q)||j.person.toLowerCase().includes(q)||(j.seqf&&j.seqf.toLowerCase().includes(q))||(j.pm&&j.pm.toLowerCase().includes(q))||(j.notes&&j.notes.toLowerCase().includes(q)));
+  if(!matches.length){dd.innerHTML='<div style="padding:12px 14px;font-size:13px;color:var(--grey-400)">No jobs found</div>';dd.style.display='block';return;}
   dd.innerHTML=matches.map(j=>{
     const cat=getCat(j.cat);
-    return`<div data-id="${j.id}" style="padding:9px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px">
+    return`<div data-id="${j.id}" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--grey-100);display:flex;align-items:center;gap:10px">
       <span style="width:8px;height:8px;border-radius:2px;background:${cat.color};flex-shrink:0"></span>
-      <div>
-        <div style="font-size:13px;font-weight:500">${j.name}${j.seqf?` <span style="font-size:11px;color:#888;font-weight:400">${j.seqf}</span>`:''}</div>
-        <div style="font-size:11px;color:#888">${j.person}${j.pm?' &middot; PM: '+j.pm:''} &middot; ${j.start} to ${j.end}</div>
-      </div>
+      <div><div style="font-size:13px;font-weight:600;color:var(--black)">${j.name}${j.seqf?` <span style="font-size:11px;color:var(--grey-400);font-weight:400">${j.seqf}</span>`:''}</div>
+      <div style="font-size:11px;color:var(--grey-400);margin-top:2px">${j.person}${j.pm?' · PM: '+j.pm:''} · ${j.start} to ${j.end}</div></div>
     </div>`;
   }).join('');
   dd.style.display='block';
-  dd.querySelectorAll('[data-id]').forEach(el=>{
-    el.addEventListener('click',()=>jumpToJob(el.dataset.id));
-  });
+  dd.querySelectorAll('[data-id]').forEach(el=>el.addEventListener('click',()=>jumpToJob(el.dataset.id)));
 }
 
 function jumpToJob(id){
-  const j=jobs.find(x=>x.id===id);
-  if(!j)return;
-  const d=toDate(j.start);
-  curYear=d.getFullYear();curMonth=d.getMonth()+1;
-  selectedDate=j.start;
-  document.getElementById('searchInput').value='';
-  document.getElementById('searchDropdown').style.display='none';
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  const d=toDate(j.start);curYear=d.getFullYear();curMonth=d.getMonth()+1;selectedDate=j.start;
+  document.getElementById('searchInput').value='';document.getElementById('searchDropdown').style.display='none';
   render();
   setTimeout(()=>{
     const bars=[...document.querySelectorAll('.job-bar,.day-card')];
     const bar=bars.find(b=>b.textContent.includes(j.name));
-    if(bar){bar.scrollIntoView({behavior:'smooth',block:'center'});bar.style.outline='2px solid #378ADD';setTimeout(()=>bar.style.outline='',1500);}
+    if(bar){bar.scrollIntoView({behavior:'smooth',block:'center'});bar.style.outline='2px solid var(--green)';setTimeout(()=>bar.style.outline='',1500);}
   },50);
 }
 
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.search-wrap'))
-    document.getElementById('searchDropdown').style.display='none';
-});
+document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))document.getElementById('searchDropdown').style.display='none';});
 </script>
 </body>
 </html>
