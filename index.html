@@ -7,38 +7,20 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 :root{
-  --green:#6ABF2E;
-  --green-dark:#52a01e;
-  --black:#111111;
-  --grey-900:#1a1a1a;
-  --grey-700:#444;
-  --grey-400:#999;
-  --grey-200:#e5e5e5;
-  --grey-100:#f5f5f5;
-  --white:#ffffff;
-  --red:#E24B4A;
-  --radius:10px;
-  --shadow:0 2px 12px rgba(0,0,0,0.08);
-  --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+  --green:#6ABF2E;--green-dark:#52a01e;--black:#111111;--grey-900:#1a1a1a;
+  --grey-700:#444;--grey-400:#999;--grey-200:#e5e5e5;--grey-100:#f5f5f5;
+  --white:#ffffff;--red:#E24B4A;--radius:10px;
+  --shadow:0 2px 12px rgba(0,0,0,0.08);--shadow-lg:0 8px 32px rgba(0,0,0,0.12);
 }
-
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:var(--grey-900);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* ── Logo ── */
-.logo{display:flex;align-items:center;gap:1px;font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1}
-.logo span.pro{color:#fff}
-.logo span.av{color:var(--green)}
-.logo sup{font-size:9px;color:#666;font-weight:500;margin-left:1px;align-self:flex-start;margin-top:3px}
-
-/* ── Auth ── */
+/* Auth */
 #authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--black);padding:1.5rem;gap:2rem}
 .auth-logo{display:flex;align-items:center;gap:3px;font-size:36px;font-weight:700;letter-spacing:-1px}
-.auth-logo span.pro{color:var(--white)}
-.auth-logo span.av{color:var(--green)}
-.auth-logo sup{font-size:13px;color:var(--grey-400);font-weight:500;margin-left:2px;align-self:flex-start;margin-top:5px}
+.auth-logo .pro{color:var(--white)}.auth-logo .av{color:var(--green)}
+.auth-logo sup{font-size:13px;color:#555;font-weight:500;margin-left:2px;align-self:flex-start;margin-top:5px}
 .auth-sub{font-size:14px;color:var(--grey-400);letter-spacing:0.05em;text-transform:uppercase;font-weight:500;margin-top:-12px}
 .auth-card{background:var(--grey-900);border-radius:16px;border:1px solid #2a2a2a;padding:2rem;width:100%;max-width:360px}
 .auth-card .field{margin-bottom:14px}
@@ -47,51 +29,52 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .auth-card input:focus{border-color:var(--green)}
 .auth-card input::placeholder{color:#555}
 .auth-err{font-size:13px;color:var(--red);margin-top:6px;min-height:18px}
-.auth-btn{width:100%;margin-top:8px;padding:12px;background:var(--green);color:var(--white);border:none;border-radius:var(--radius);font-size:15px;cursor:pointer;font-weight:600;font-family:inherit;transition:background 0.15s}
+.auth-btn{width:100%;margin-top:8px;padding:12px;background:var(--green);color:var(--white);border:none;border-radius:var(--radius);font-size:15px;cursor:pointer;font-weight:600;font-family:inherit}
 .auth-btn:hover{background:var(--green-dark)}
 
-/* ── App shell ── */
+/* App */
 #appScreen{display:none;min-height:100vh}
 
-/* ── Top bar ── */
-.topbar{background:var(--black);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100}
-.topbar-left{display:flex;align-items:center;gap:16px}
+/* Topbar */
+.topbar{background:var(--black);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:2px;font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.logo .pro{color:var(--white)}.logo .av{color:var(--green)}
+.logo sup{font-size:9px;color:#555;font-weight:500;margin-left:1px;align-self:flex-start;margin-top:3px}
 .topbar-right{display:flex;align-items:center;gap:8px}
-.topbar-divider{width:1px;height:20px;background:#333}
-.scheduler-label{font-size:12px;font-weight:500;color:var(--grey-400);letter-spacing:0.08em;text-transform:uppercase}
+.topbar-label{font-size:12px;font-weight:500;color:var(--grey-400);letter-spacing:0.08em;text-transform:uppercase;margin-left:12px;padding-left:12px;border-left:1px solid #333}
 
-/* ── Main content ── */
+/* Main */
 .main{padding:1.25rem 1.5rem 3rem}
 
-/* ── Calendar toolbar ── */
+/* Cal toolbar */
 .cal-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
 .cal-toolbar-left{display:flex;align-items:center;gap:8px;flex:1}
 .month-display{font-size:18px;font-weight:600;color:var(--black);min-width:160px}
 .nav-btn{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--grey-700);transition:all 0.15s;flex-shrink:0}
 .nav-btn:hover{border-color:var(--green);color:var(--green)}
 .cal-toolbar-right{display:flex;align-items:center;gap:8px}
-.btn-primary{background:var(--green);color:var(--white);border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s;display:flex;align-items:center;gap:5px}
+.btn-primary{background:var(--green);color:var(--white);border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s}
 .btn-primary:hover{background:var(--green-dark)}
-.btn-ghost{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--grey-700);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s}
+.btn-ghost{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--grey-700);cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn-ghost:hover{border-color:var(--grey-400)}
 
-/* ── Search ── */
+/* Search */
 .search-wrap{position:relative;min-width:160px;max-width:220px;flex:1}
 .search-wrap input{width:100%;font-size:13px;padding:7px 10px 7px 32px;border:1px solid var(--grey-200);border-radius:8px;outline:none;background:var(--white);font-family:inherit;color:var(--grey-900)}
 .search-wrap input:focus{border-color:var(--green)}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--grey-400);font-size:13px;pointer-events:none}
 #searchDropdown{display:none;position:absolute;top:38px;left:0;width:310px;max-width:90vw;background:var(--white);border:1px solid var(--grey-200);border-radius:12px;box-shadow:var(--shadow-lg);z-index:500;max-height:280px;overflow-y:auto}
 
-/* ── Legend ── */
+/* Legend */
 .legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:1rem}
 .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey-700);font-weight:500}
 .legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 .cat-note{font-size:10px;color:var(--grey-400);font-weight:400}
 
-/* ── Desktop calendar ── */
+/* Desktop calendar */
 .cal-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
 .cal-desktop{width:100%;border-collapse:collapse}
-.cal-desktop th{font-size:11px;color:var(--grey-400);padding:10px 8px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--white)}
+.cal-desktop th{font-size:11px;color:var(--grey-400);padding:10px 8px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
 .cal-desktop td{vertical-align:top;border-right:1px solid var(--grey-200);border-bottom:1px solid var(--grey-200);padding:6px;height:96px;width:calc(100%/7);cursor:pointer;transition:background 0.1s}
 .cal-desktop td:last-child{border-right:none}
 .cal-desktop tr:last-child td{border-bottom:none}
@@ -99,16 +82,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .day-num{font-size:12px;font-weight:500;color:var(--grey-400);margin-bottom:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .day-num.today{background:var(--green);color:var(--white);font-weight:700}
 .day-num.other-month{color:var(--grey-200)}
-.job-bar{font-size:10px;font-weight:500;border-radius:5px;padding:2px 6px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:opacity 0.1s}
+.job-bar{font-size:10px;font-weight:500;border-radius:5px;padding:2px 6px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .job-bar:hover{opacity:0.8}
 
-/* ── Mobile calendar ── */
+/* Mobile */
 .cal-mobile{display:none}
+.view-toggle{display:flex;gap:4px;background:var(--grey-100);border-radius:8px;padding:3px;border:1px solid var(--grey-200)}
+.view-toggle button{border:none;background:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--grey-400);font-family:inherit;transition:all 0.15s}
+.view-toggle button.active{background:var(--white);color:var(--black);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+
+/* Mobile dot view */
 .cal-mobile-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow);padding:12px}
 .cal-mobile-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
 .cal-mobile-header span{text-align:center;font-size:10px;font-weight:700;color:var(--grey-400);padding:4px 0;text-transform:uppercase;letter-spacing:0.06em}
 .cal-mobile-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.cal-mobile-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;position:relative;flex-direction:column;gap:3px}
+.cal-mobile-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;flex-direction:column;gap:3px}
 .cnum{font-size:14px;font-weight:500;color:var(--grey-900);line-height:1}
 .cal-mobile-cell.other-month .cnum{color:var(--grey-200)}
 .cal-mobile-cell.today .cnum{background:var(--green);color:var(--white);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
@@ -119,79 +107,68 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .cal-mobile-dots{display:flex;gap:2px;justify-content:center}
 .cal-mobile-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
 
-/* ── Mobile view toggle ── */
-.view-toggle{display:flex;gap:4px;background:var(--grey-100);border-radius:8px;padding:3px}
-.view-toggle button{border:none;background:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:var(--grey-400);font-family:inherit;transition:all 0.15s}
-.view-toggle button.active{background:var(--white);color:var(--black);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+/* Mobile month overview */
+.cal-month-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
+.cal-month-table{width:100%;border-collapse:collapse}
+.cal-month-table th{font-size:9px;color:var(--grey-400);padding:7px 2px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
+.cal-month-table td{vertical-align:top;border-right:1px solid var(--grey-100);border-bottom:1px solid var(--grey-100);padding:3px 2px;width:calc(100%/7);cursor:pointer;min-height:52px}
+.cal-month-table td:last-child{border-right:none}
+.cal-month-table tr:last-child td{border-bottom:none}
+.mo-num{font-size:10px;font-weight:500;color:var(--grey-400);width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:2px}
+.mo-num.today{background:var(--green);color:var(--white);font-weight:700}
+.mo-num.other-month{color:var(--grey-200)}
+.mo-bar{font-size:8px;font-weight:500;border-radius:3px;padding:1px 3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
 
-/* ── Mobile month overview ── */
-.cal-month-overview{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
-.cal-month-overview table{width:100%;border-collapse:collapse}
-.cal-month-overview th{font-size:9px;color:var(--grey-400);padding:6px 2px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
-.cal-month-overview td{vertical-align:top;border-right:1px solid var(--grey-100);border-bottom:1px solid var(--grey-100);padding:3px 2px;width:calc(100%/7);cursor:pointer}
-.cal-month-overview td:last-child{border-right:none}
-.cal-month-overview tr:last-child td{border-bottom:none}
-.mo-day-num{font-size:10px;font-weight:500;color:var(--grey-400);width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:2px}
-.mo-day-num.today{background:var(--green);color:var(--white);font-weight:700}
-.mo-day-num.other-month{color:var(--grey-200)}
-.mo-bar{font-size:8px;font-weight:500;border-radius:3px;padding:1px 3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
-.day-panel{display:none;margin-top:12px}
+/* Day panel */
+.day-panel{margin-top:12px}
 .day-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
 .day-panel-title{font-size:15px;font-weight:600;color:var(--black)}
 .day-panel-empty{font-size:14px;color:var(--grey-400);padding:20px 0;text-align:center}
-.day-card{background:var(--white);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;border:1px solid var(--grey-200);border-left:4px solid var(--grey-200);box-shadow:var(--shadow);transition:box-shadow 0.15s}
-.day-card:active{box-shadow:none}
+.day-card{background:var(--white);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;border:1px solid var(--grey-200);border-left:4px solid var(--grey-200);box-shadow:var(--shadow)}
 .day-card-title{font-size:14px;font-weight:600;color:var(--black);margin-bottom:5px}
 .day-card-meta{font-size:12px;color:var(--grey-400);display:flex;flex-wrap:wrap;gap:8px}
 
-/* ── Conflict panel ── */
+/* Conflict panel */
 .conflict-panel{background:var(--white);border:1px solid var(--grey-200);border-radius:14px;padding:1.1rem 1.25rem;margin-top:1rem;box-shadow:var(--shadow)}
 .conflict-panel h3{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;color:var(--black);text-transform:uppercase;letter-spacing:0.05em}
 .conflict-item{font-size:13px;color:var(--grey-700);padding:6px 0;border-bottom:1px solid var(--grey-100)}
 .conflict-item:last-child{border-bottom:none}
 .no-conflicts{font-size:13px;color:var(--grey-400);font-style:italic}
 
-/* ── Modal ── */
+/* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--white);border-radius:16px;padding:1.75rem;width:430px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
 .modal-box h3{font-size:17px;font-weight:700;margin-bottom:1.25rem;color:var(--black)}
 .field{margin-bottom:14px}
 .field label{font-size:11px;font-weight:700;color:var(--grey-400);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em}
-.field input,.field select,.field textarea{width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--grey-200);border-radius:var(--radius);outline:none;font-family:inherit;color:var(--grey-900);background:var(--white);transition:border-color 0.15s}
+.field input,.field select,.field textarea{width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--grey-200);border-radius:var(--radius);outline:none;font-family:inherit;color:var(--grey-900);background:var(--white)}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green)}
 .field textarea{resize:vertical}
 .modal-btns{display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end}
-.modal-btns button{font-size:14px;padding:9px 20px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--grey-200);background:var(--white);font-family:inherit;font-weight:500;transition:all 0.15s}
+.modal-btns button{font-size:14px;padding:9px 20px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--grey-200);background:var(--white);font-family:inherit;font-weight:500}
 .modal-btns button:hover{background:var(--grey-100)}
 .modal-btns .save-btn{background:var(--green);color:var(--white);border-color:var(--green);font-weight:600}
 .modal-btns .save-btn:hover{background:var(--green-dark)}
 .modal-btns .save-btn:disabled{background:var(--grey-200);border-color:var(--grey-200);color:var(--grey-400);cursor:not-allowed}
-.modal-btns .del-btn{color:var(--red);border-color:#fdd;background:#fff}
+.modal-btns .del-btn{color:var(--red);border-color:#fdd}
 .modal-btns .del-btn:hover{background:#fff5f5}
-
-/* ── View modal ── */
 .view-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid var(--grey-100)}
 .view-row:last-child{border-bottom:none}
 .view-label{font-size:11px;font-weight:700;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.07em}
 .view-value{font-size:14px;color:var(--grey-900);font-weight:500}
 .notes-box{margin-top:4px;padding:10px 12px;background:var(--grey-100);border-radius:8px;font-size:13px;color:var(--grey-700);line-height:1.6}
 
-/* ── Team full indicator ── */
-.team-full-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--red);background:#fff0f0;border:1px solid #fdd;border-radius:4px;padding:1px 5px;margin-left:4px}
-
-/* ── Mobile overrides ── */
+/* Mobile overrides */
 @media(max-width:768px){
   .topbar{padding:0 1rem;height:52px}
-  .scheduler-label{display:none}
-  .topbar-divider{display:none}
+  .topbar-label{display:none}
   .main{padding:1rem 0.875rem 4rem}
   .cal-toolbar{gap:8px;margin-bottom:0.875rem}
   .month-display{font-size:16px;min-width:130px}
   .search-wrap{max-width:100%;order:5;flex-basis:100%}
-  .cal-desktop{display:none}
+  .cal-wrap{display:none}
   .cal-mobile{display:block}
-  .day-panel{display:block}
   .modal-overlay{align-items:flex-end}
   .modal-box{border-radius:20px 20px 0 0;width:100%;max-width:100%;padding:1.5rem 1.25rem 2.5rem}
   .field input,.field select,.field textarea{font-size:16px;padding:11px 13px}
@@ -201,7 +178,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 </head>
 <body>
 
-<!-- Auth -->
 <div id="authScreen">
   <div style="text-align:center">
     <div class="auth-logo"><span class="pro">pro</span><span class="av">AV</span><sup>®</sup></div>
@@ -215,13 +191,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
   </div>
 </div>
 
-<!-- App -->
 <div id="appScreen">
   <div class="topbar">
-    <div class="topbar-left">
+    <div style="display:flex;align-items:center">
       <div class="logo"><span class="pro">pro</span><span class="av">AV</span><sup>®</sup></div>
-      <div class="topbar-divider"></div>
-      <div class="scheduler-label">Team Scheduler</div>
+      <span class="topbar-label">Team Scheduler</span>
     </div>
     <div class="topbar-right">
       <button class="btn-ghost" onclick="signOut()" style="font-size:12px;padding:6px 12px">Sign out</button>
@@ -247,7 +221,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 
     <div class="legend" id="legend"></div>
 
-    <!-- Desktop calendar -->
+    <!-- Desktop -->
     <div class="cal-wrap">
       <table class="cal-desktop">
         <thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
@@ -255,18 +229,18 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
       </table>
     </div>
 
-    <!-- Mobile calendar -->
+    <!-- Mobile -->
     <div class="cal-mobile" id="calMobile">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:13px;font-weight:600;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.06em">View</span>
+        <span style="font-size:12px;font-weight:600;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.06em">View</span>
         <div class="view-toggle">
-          <button id="toggleDots" class="active" onclick="setMobileView('dots')">Detail</button>
-          <button id="toggleMonth" onclick="setMobileView('month')">Month</button>
+          <button id="btnDetail" class="active" onclick="setMobileView('detail')">Detail</button>
+          <button id="btnMonth" onclick="setMobileView('month')">Month</button>
         </div>
       </div>
 
-      <!-- Dot/detail view -->
-      <div id="mobileDotsView">
+      <!-- Detail view -->
+      <div id="detailView">
         <div class="cal-mobile-wrap">
           <div class="cal-mobile-header">
             <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
@@ -282,12 +256,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
         </div>
       </div>
 
-      <!-- Month overview view -->
-      <div id="mobileMonthView" style="display:none">
-        <div class="cal-month-overview">
-          <table>
+      <!-- Month overview -->
+      <div id="monthView" style="display:none">
+        <div class="cal-month-wrap">
+          <table class="cal-month-table">
             <thead><tr><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th><th>S</th></tr></thead>
-            <tbody id="mobileMonthBody"></tbody>
+            <tbody id="monthViewBody"></tbody>
           </table>
         </div>
       </div>
@@ -343,12 +317,16 @@ const CATEGORIES=[
 ];
 function getCat(id){return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]}
 
-let mobileView='dots'; // 'dots' or 'month'
+let jobs=[], curYear=new Date().getFullYear(), curMonth=new Date().getMonth()+1;
+let selectedDate=fmt(new Date()), editingId=null, isAdmin=false, mobileView='detail';
 
 // Swipe
 let txStart=0;
 document.getElementById('calMobile').addEventListener('touchstart',e=>txStart=e.touches[0].clientX,{passive:true});
-document.getElementById('calMobile').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-txStart;if(Math.abs(dx)>50)changeMonth(dx<0?1:-1);},{passive:true});
+document.getElementById('calMobile').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-txStart;
+  if(Math.abs(dx)>50)changeMonth(dx<0?1:-1);
+},{passive:true});
 
 // Auth
 async function signIn(){
@@ -359,14 +337,19 @@ async function signIn(){
   if(error){document.getElementById('authErr').textContent=error.message;return;}
   showApp();
 }
-async function signOut(){await sb.auth.signOut();document.getElementById('appScreen').style.display='none';document.getElementById('authScreen').style.display='flex';}
+async function signOut(){
+  await sb.auth.signOut();
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+}
 async function showApp(){
   document.getElementById('authScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
   const{data:{user}}=await sb.auth.getUser();
   isAdmin=user?.user_metadata?.role==='admin';
   document.getElementById('addJobBtn').style.display=isAdmin?'':'none';
-  await loadJobs();render();
+  await loadJobs();
+  render();
 }
 sb.auth.onAuthStateChange((e,s)=>{if(s)showApp();});
 
@@ -374,6 +357,15 @@ sb.auth.onAuthStateChange((e,s)=>{if(s)showApp();});
 async function loadJobs(){
   const{data,error}=await sb.from('jobs').select('*').order('start_date');
   if(!error)jobs=data.map(j=>({id:j.id,name:j.name,cat:j.cat,person:j.person,start:j.start_date,end:j.end_date,notes:j.notes,seqf:j.seqf,pm:j.pm}));
+}
+
+// Mobile view toggle
+function setMobileView(v){
+  mobileView=v;
+  document.getElementById('btnDetail').classList.toggle('active',v==='detail');
+  document.getElementById('btnMonth').classList.toggle('active',v==='month');
+  document.getElementById('detailView').style.display=v==='detail'?'block':'none';
+  document.getElementById('monthView').style.display=v==='month'?'block':'none';
 }
 
 // Modals
@@ -388,8 +380,7 @@ document.getElementById('viewOverlay').addEventListener('click',function(e){if(e
 function openAddModal(){
   editingId=null;
   document.getElementById('modalTitle').textContent='Add job';
-  document.getElementById('fName').value='';document.getElementById('fSeqf').value='';
-  document.getElementById('fPm').value='';document.getElementById('fNotes').value='';
+  ['fName','fSeqf','fPm','fNotes'].forEach(id=>document.getElementById(id).value='');
   buildCatSelect(CATEGORIES[0].id);buildPersonSelect(PEOPLE[0]);
   const t=fmt(new Date());
   document.getElementById('fStart').value=t;document.getElementById('fEnd').value=t;
@@ -397,7 +388,10 @@ function openAddModal(){
   document.getElementById('saveBtn').disabled=false;document.getElementById('saveBtn').textContent='Save';
   openModal();
 }
-function openAddModalDate(date){openAddModal();document.getElementById('fStart').value=date;document.getElementById('fEnd').value=date;}
+function openAddModalDate(date){
+  openAddModal();
+  document.getElementById('fStart').value=date;document.getElementById('fEnd').value=date;
+}
 function openEditModal(id){
   editingId=id;const j=jobs.find(x=>x.id===id);
   document.getElementById('modalTitle').textContent='Edit job';
@@ -442,7 +436,9 @@ async function saveJob(){
 }
 async function deleteJob(){
   if(!confirm('Delete this job?'))return;
-  closeModal();await sb.from('jobs').delete().eq('id',editingId);await loadJobs();render();
+  closeModal();
+  await sb.from('jobs').delete().eq('id',editingId);
+  await loadJobs();render();
 }
 
 // Helpers
@@ -450,7 +446,13 @@ function toDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d
 function fmt(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function buildCatSelect(val){document.getElementById('fCat').innerHTML=CATEGORIES.map(c=>`<option value="${c.id}"${c.id===val?' selected':''}>${c.label}</option>`).join('')}
 function buildPersonSelect(val){document.getElementById('fPerson').innerHTML=PEOPLE.map(p=>`<option${p===val?' selected':''}>${p}</option>`).join('')}
-function changeMonth(d){curMonth+=d;if(curMonth>12){curMonth=1;curYear++}if(curMonth<1){curMonth=12;curYear--}selectedDate=fmt(new Date(curYear,curMonth-1,1));render();}
+function changeMonth(d){
+  curMonth+=d;
+  if(curMonth>12){curMonth=1;curYear++}
+  if(curMonth<1){curMonth=12;curYear--}
+  selectedDate=fmt(new Date(curYear,curMonth-1,1));
+  render();
+}
 function buildCells(){
   const first=new Date(curYear,curMonth-1,1);
   let dow=first.getDay();dow=dow===0?6:dow-1;
@@ -466,58 +468,15 @@ function jobsForDate(date){return jobs.filter(j=>{const s=toDate(j.start),e=toDa
 function isTeamFull(dj){const b=new Set(dj.map(j=>j.person));return CONFLICT_CHECK_PEOPLE.every(p=>b.has(p))}
 function barLabel(j){return(j.seqf?j.seqf+' – ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠':j.person)+')'}
 
-function setMobileView(v){
-  mobileView=v;
-  document.getElementById('toggleDots').classList.toggle('active',v==='dots');
-  document.getElementById('toggleMonth').classList.toggle('active',v==='month');
-  document.getElementById('mobileDotsView').style.display=v==='dots'?'':'none';
-  document.getElementById('mobileMonthView').style.display=v==='month'?'':'none';
-  if(v==='month')renderMobileMonth();
-}
-
+// Render
 function render(){
   document.getElementById('monthLabel').textContent=new Date(curYear,curMonth-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
   renderDesktop();
-  renderMobileGrid();
+  renderMobileDots();
   renderDayPanel();
-  if(mobileView==='month')renderMobileMonth();
+  renderMobileMonth();
   buildLegend();
   renderConflicts();
-}
-
-function renderMobileMonth(){
-  const tbody=document.getElementById('mobileMonthBody');tbody.innerHTML='';
-  const today=fmt(new Date());
-  const cells=buildCells();
-  for(let r=0;r<cells.length/7;r++){
-    const tr=document.createElement('tr');
-    for(let c=0;c<7;c++){
-      const cell=cells[r*7+c];
-      const td=document.createElement('td');
-      if(isTeamFull(jobsForDate(cell.date)))td.style.outline='2px solid var(--red)';
-      td.addEventListener('click',()=>{
-        selectedDate=cell.date;
-        setMobileView('dots');
-        renderMobileGrid();
-        renderDayPanel();
-      });
-      const dn=document.createElement('div');
-      dn.className='mo-day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
-      dn.textContent=parseInt(cell.date.split('-')[2]);
-      td.appendChild(dn);
-      jobsForDate(cell.date).forEach(j=>{
-        const cat=getCat(j.cat);
-        const bar=document.createElement('div');
-        bar.className='mo-bar';
-        bar.style.background=cat.color+'33';
-        bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
-        bar.textContent=j.seqf||j.name;
-        td.appendChild(bar);
-      });
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
-  }
 }
 
 function renderDesktop(){
@@ -552,7 +511,7 @@ function renderDesktop(){
   }
 }
 
-function renderMobileGrid(){
+function renderMobileDots(){
   const grid=document.getElementById('calMobileGrid');grid.innerHTML='';
   const today=fmt(new Date());
   buildCells().forEach(cell=>{
@@ -567,9 +526,44 @@ function renderMobileGrid(){
       });
       div.appendChild(dots);
     }
-    div.addEventListener('click',()=>{selectedDate=cell.date;renderMobileGrid();renderDayPanel();});
+    div.addEventListener('click',()=>{selectedDate=cell.date;renderMobileDots();renderDayPanel();});
     grid.appendChild(div);
   });
+}
+
+function renderMobileMonth(){
+  const tbody=document.getElementById('monthViewBody');tbody.innerHTML='';
+  const today=fmt(new Date());
+  const cells=buildCells();
+  for(let r=0;r<cells.length/7;r++){
+    const tr=document.createElement('tr');
+    for(let c=0;c<7;c++){
+      const cell=cells[r*7+c];
+      const td=document.createElement('td');
+      const dj=jobsForDate(cell.date);
+      if(isTeamFull(dj))td.style.outline='2px solid var(--red)';
+      td.addEventListener('click',()=>{
+        selectedDate=cell.date;
+        setMobileView('detail');
+        renderMobileDots();
+        renderDayPanel();
+      });
+      const dn=document.createElement('div');
+      dn.className='mo-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
+      dn.textContent=parseInt(cell.date.split('-')[2]);
+      td.appendChild(dn);
+      dj.forEach(j=>{
+        const cat=getCat(j.cat);
+        const bar=document.createElement('div');bar.className='mo-bar';
+        bar.style.background=cat.color+'33';
+        bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
+        bar.textContent=j.seqf||j.name;
+        td.appendChild(bar);
+      });
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
 }
 
 function renderDayPanel(){
