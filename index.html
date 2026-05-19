@@ -179,6 +179,16 @@ body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a;overflow-x:h
   </div>
 </div>
 
+<div class="modal-overlay" id="viewOverlay">
+  <div class="modal-box">
+    <h3 id="viewTitle">Job details</h3>
+    <div id="viewBody" style="font-size:14px;line-height:1.8;color:#333"></div>
+    <div class="modal-btns" style="margin-top:1.25rem">
+      <button id="viewCloseBtn">Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box">
     <h3 id="modalTitle">Add job</h3>
@@ -262,7 +272,26 @@ async function loadJobs(){
 // Modal
 function openModal(){document.getElementById('modalOverlay').classList.add('open')}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
-document.getElementById('cancelBtn').addEventListener('click',e=>{e.stopPropagation();closeModal();});
+document.getElementById('viewCloseBtn').addEventListener('click',()=>document.getElementById('viewOverlay').classList.remove('open'));
+document.getElementById('viewOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+
+function openViewModal(id){
+  const j=jobs.find(x=>x.id===id);
+  const cat=getCat(j.cat);
+  document.getElementById('viewTitle').textContent=j.name;
+  document.getElementById('viewBody').innerHTML=`
+    ${j.seqf?`<div><strong>SEQF:</strong> ${j.seqf}</div>`:''}
+    <div><strong>Category:</strong> <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${cat.color};margin-right:4px;vertical-align:middle"></span>${cat.label}</div>
+    <div><strong>Assigned to:</strong> ${j.person}</div>
+    ${j.pm?`<div><strong>Project manager:</strong> ${j.pm}</div>`:''}
+    <div><strong>Start:</strong> ${j.start}</div>
+    <div><strong>End:</strong> ${j.end}</div>
+    ${j.notes?`<div style="margin-top:8px;padding:8px 10px;background:#f9f9f9;border-radius:8px;border-left:3px solid #ddd"><strong>Notes:</strong><br>${j.notes}</div>`:''}
+  `;
+  document.getElementById('viewOverlay').classList.add('open');
+}
+
+
 document.getElementById('saveBtn').addEventListener('click',saveJob);
 document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
@@ -392,7 +421,7 @@ function renderDesktop(){
       const td=document.createElement('td');
       const dayJobs=jobsForDate(cell.date);
       if(isTeamFull(dayJobs))td.style.outline='2px solid #E24B4A';
-      td.addEventListener('click',()=>openAddModalDate(cell.date));
+      td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
       const dn=document.createElement('div');
       dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
       dn.textContent=parseInt(cell.date.split('-')[2]);
@@ -405,7 +434,7 @@ function renderDesktop(){
         bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
         bar.style.borderLeft=`2px solid ${cat.color}`;
         bar.textContent=(j.seqf?j.seqf+' - ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠ Unassigned':j.person)+')';
-        bar.addEventListener('click',e=>{e.stopPropagation();if(isAdmin)openEditModal(j.id);});
+        bar.addEventListener('click',e=>{e.stopPropagation();isAdmin?openEditModal(j.id):openViewModal(j.id);});
         td.appendChild(bar);
       });
       tr.appendChild(td);
@@ -471,7 +500,7 @@ function renderDayPanel(){
         ${j.pm?`<span>📋 PM: ${j.pm}</span>`:''}
         <span>📅 ${j.start} – ${j.end}</span>
       </div>`;
-    card.addEventListener('click',()=>{if(isAdmin)openEditModal(j.id);});
+    card.addEventListener('click',()=>{isAdmin?openEditModal(j.id):openViewModal(j.id);});
     container.appendChild(card);
   });
 }
