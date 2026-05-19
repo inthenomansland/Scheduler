@@ -226,7 +226,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
           <input type="text" id="searchInput" placeholder="Search jobs, SEQF, PM..." oninput="onSearch()">
           <div id="searchDropdown"></div>
         </div>
-        <button id="addJobBtn" class="btn-primary" onclick="openAddModal()">&#＋; Add job</button>
+        <button id="addJobBtn" class="btn-primary" onclick="openAddModal()">+ Add job</button>
       </div>
     </div>
 
@@ -439,28 +439,33 @@ function render(){
 function renderDesktop(){
   const tbody=document.getElementById('calBody');tbody.innerHTML='';
   const today=fmt(new Date());
-  buildCells().forEach((cell,i)=>{
-    if(i%7===0){var tr=document.createElement('tr');tbody.appendChild(tr);}
-    const td=document.createElement('td');
-    const dj=jobsForDate(cell.date);
-    if(isTeamFull(dj))td.style.outline='2px solid var(--red)';
-    td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
-    const dn=document.createElement('div');
-    dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
-    dn.textContent=parseInt(cell.date.split('-')[2]);
-    td.appendChild(dn);
-    dj.forEach(j=>{
-      const cat=getCat(j.cat);
-      const bar=document.createElement('div');bar.className='job-bar';
-      bar.style.background=cat.color+'28';
-      bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
-      bar.style.borderLeft=`3px solid ${cat.color}`;
-      bar.textContent=barLabel(j);
-      bar.addEventListener('click',e=>{e.stopPropagation();isAdmin?openEditModal(j.id):openViewModal(j.id);});
-      td.appendChild(bar);
-    });
-    tr.appendChild(td);
-  });
+  const cells=buildCells();
+  for(let r=0;r<cells.length/7;r++){
+    const tr=document.createElement('tr');
+    for(let c=0;c<7;c++){
+      const cell=cells[r*7+c];
+      const td=document.createElement('td');
+      const dj=jobsForDate(cell.date);
+      if(isTeamFull(dj))td.style.outline='2px solid var(--red)';
+      td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
+      const dn=document.createElement('div');
+      dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
+      dn.textContent=parseInt(cell.date.split('-')[2]);
+      td.appendChild(dn);
+      dj.forEach(j=>{
+        const cat=getCat(j.cat);
+        const bar=document.createElement('div');bar.className='job-bar';
+        bar.style.background=cat.color+'28';
+        bar.style.color=cat.color==='#F5C842'?'#7a6000':cat.color;
+        bar.style.borderLeft=`3px solid ${cat.color}`;
+        bar.textContent=barLabel(j);
+        bar.addEventListener('click',e=>{e.stopPropagation();isAdmin?openEditModal(j.id):openViewModal(j.id);});
+        td.appendChild(bar);
+      });
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
 }
 
 function renderMobileGrid(){
