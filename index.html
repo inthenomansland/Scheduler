@@ -34,26 +34,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 
 /* App */
 #appScreen{display:none;min-height:100vh}
-
-/* Topbar */
 .topbar{background:var(--black);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{display:flex;align-items:center;gap:2px;font-size:22px;font-weight:700;letter-spacing:-0.5px}
 .logo .pro{color:var(--white)}.logo .av{color:var(--green)}
 .logo sup{font-size:9px;color:#555;font-weight:500;margin-left:1px;align-self:flex-start;margin-top:3px}
-.topbar-right{display:flex;align-items:center;gap:8px}
 .topbar-label{font-size:12px;font-weight:500;color:var(--grey-400);letter-spacing:0.08em;text-transform:uppercase;margin-left:12px;padding-left:12px;border-left:1px solid #333}
-
-/* Main */
 .main{padding:1.25rem 1.5rem 3rem}
 
-/* Cal toolbar */
+/* Toolbar */
 .cal-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
 .cal-toolbar-left{display:flex;align-items:center;gap:8px;flex:1}
 .month-display{font-size:18px;font-weight:600;color:var(--black);min-width:160px}
-.nav-btn{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--grey-700);transition:all 0.15s;flex-shrink:0}
+.nav-btn{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--grey-700);flex-shrink:0}
 .nav-btn:hover{border-color:var(--green);color:var(--green)}
 .cal-toolbar-right{display:flex;align-items:center;gap:8px}
-.btn-primary{background:var(--green);color:var(--white);border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s}
+.btn-primary{background:var(--green);color:var(--white);border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn-primary:hover{background:var(--green-dark)}
 .btn-ghost{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--grey-700);cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn-ghost:hover{border-color:var(--grey-400)}
@@ -65,25 +60,27 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--grey-400);font-size:13px;pointer-events:none}
 #searchDropdown{display:none;position:absolute;top:38px;left:0;width:310px;max-width:90vw;background:var(--white);border:1px solid var(--grey-200);border-radius:12px;box-shadow:var(--shadow-lg);z-index:500;max-height:280px;overflow-y:auto}
 
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0.75rem}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey-700);font-weight:500}
+.legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.cat-note{font-size:10px;color:var(--grey-400);font-weight:400}
+
 /* Filter bar */
 .filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;align-items:center}
 .filter-label{font-size:11px;font-weight:700;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.07em;margin-right:2px}
 .filter-divider{width:1px;height:20px;background:var(--grey-200);margin:0 4px}
-.filter-btn{border:1px solid var(--grey-200);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;background:var(--white);color:var(--grey-700);font-family:inherit;transition:all 0.15s;display:flex;align-items:center;gap:5px}
+.filter-btn{border:1px solid var(--grey-200);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;background:var(--white);color:var(--grey-700);font-family:inherit;display:flex;align-items:center;gap:5px}
 .filter-btn:hover{border-color:var(--grey-400)}
 .filter-btn.active{color:var(--white);border-color:transparent}
 .filter-clear{border:none;background:none;font-size:12px;color:var(--grey-400);cursor:pointer;font-family:inherit;padding:4px 6px;font-weight:500}
 .filter-clear:hover{color:var(--grey-700)}
-.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:1rem}
-.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey-700);font-weight:500}
-.legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-.cat-note{font-size:10px;color:var(--grey-400);font-weight:400}
 
 /* Desktop calendar */
 .cal-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
 .cal-desktop{width:100%;border-collapse:collapse}
 .cal-desktop th{font-size:11px;color:var(--grey-400);padding:10px 8px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
-.cal-desktop td{vertical-align:top;border-right:1px solid var(--grey-200);border-bottom:1px solid var(--grey-200);padding:6px;height:96px;width:calc(100%/7);cursor:pointer;transition:background 0.1s}
+.cal-desktop td{vertical-align:top;border-right:1px solid var(--grey-200);border-bottom:1px solid var(--grey-200);padding:6px;height:96px;width:calc(100%/7);cursor:pointer}
 .cal-desktop td:last-child{border-right:none}
 .cal-desktop tr:last-child td{border-bottom:none}
 .cal-desktop td:hover{background:#f9fff5}
@@ -96,10 +93,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 /* Mobile */
 .cal-mobile{display:none}
 .view-toggle{display:flex;gap:4px;background:var(--grey-100);border-radius:8px;padding:3px;border:1px solid var(--grey-200)}
-.view-toggle button{border:none;background:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--grey-400);font-family:inherit;transition:all 0.15s}
+.view-toggle button{border:none;background:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--grey-400);font-family:inherit}
 .view-toggle button.active{background:var(--white);color:var(--black);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
-
-/* Mobile dot view */
 .cal-mobile-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow);padding:12px}
 .cal-mobile-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
 .cal-mobile-header span{text-align:center;font-size:10px;font-weight:700;color:var(--grey-400);padding:4px 0;text-transform:uppercase;letter-spacing:0.06em}
@@ -114,8 +109,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .cal-mobile-cell.team-full{outline:2px solid var(--red);border-radius:8px}
 .cal-mobile-dots{display:flex;gap:2px;justify-content:center}
 .cal-mobile-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
-
-/* Mobile month overview */
 .cal-month-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
 .cal-month-table{width:100%;border-collapse:collapse}
 .cal-month-table th{font-size:9px;color:var(--grey-400);padding:7px 2px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
@@ -126,8 +119,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .mo-num.today{background:var(--green);color:var(--white);font-weight:700}
 .mo-num.other-month{color:var(--grey-200)}
 .mo-bar{font-size:8px;font-weight:500;border-radius:3px;padding:1px 3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
-
-/* Day panel */
 .day-panel{margin-top:12px}
 .day-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
 .day-panel-title{font-size:15px;font-weight:600;color:var(--black)}
@@ -205,7 +196,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
       <div class="logo"><span class="pro">pro</span><span class="av">AV</span><sup>®</sup></div>
       <span class="topbar-label">Team Scheduler</span>
     </div>
-    <div class="topbar-right">
+    <div style="display:flex;align-items:center;gap:8px">
       <button class="btn-ghost" onclick="signOut()" style="font-size:12px;padding:6px 12px">Sign out</button>
     </div>
   </div>
@@ -247,8 +238,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
           <button id="btnMonth" onclick="setMobileView('month')">Month</button>
         </div>
       </div>
-
-      <!-- Detail view -->
       <div id="detailView">
         <div class="cal-mobile-wrap">
           <div class="cal-mobile-header">
@@ -264,8 +253,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
           <div id="dayPanelJobs"></div>
         </div>
       </div>
-
-      <!-- Month overview -->
       <div id="monthView" style="display:none">
         <div class="cal-month-wrap">
           <table class="cal-month-table">
@@ -374,7 +361,7 @@ async function loadJobs(){
   if(!error)jobs=data.map(j=>({id:j.id,name:j.name,cat:j.cat,person:j.person,start:j.start_date,end:j.end_date,notes:j.notes,seqf:j.seqf,pm:j.pm}));
 }
 
-// Mobile view toggle
+// Mobile view
 function setMobileView(v){
   mobileView=v;
   document.getElementById('btnDetail').classList.toggle('active',v==='detail');
@@ -480,50 +467,6 @@ function buildCells(){
   return cells;
 }
 function jobsForDate(date){return jobs.filter(j=>{const s=toDate(j.start),e=toDate(j.end),cd=toDate(date);return cd>=s&&cd<=e;})}
-function isTeamFull(dj){const b=new Set(dj.map(j=>j.person));return CONFLICT_CHECK_PEOPLE.every(p=>b.has(p))}
-function barLabel(j){return(j.seqf?j.seqf+' – ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠':j.person)+')'}
-
-function buildFilterBar(){
-  const bar=document.getElementById('filterBar');bar.innerHTML='';
-  const hasFilters=filterPeople.size>0||filterCats.size>0;
-
-  // People
-  const pl=document.createElement('span');pl.className='filter-label';pl.textContent='Team';bar.appendChild(pl);
-  PEOPLE.filter(p=>p!=='Unassigned').forEach(p=>{
-    const btn=document.createElement('button');btn.className='filter-btn'+(filterPeople.has(p)?' active':'');
-    btn.textContent=p;
-    if(filterPeople.has(p))btn.style.background='#378ADD';
-    btn.addEventListener('click',()=>{
-      filterPeople.has(p)?filterPeople.delete(p):filterPeople.add(p);
-      buildFilterBar();render();
-    });
-    bar.appendChild(btn);
-  });
-
-  // Divider
-  const div=document.createElement('div');div.className='filter-divider';bar.appendChild(div);
-
-  // Categories
-  const cl=document.createElement('span');cl.className='filter-label';cl.textContent='Type';bar.appendChild(cl);
-  CATEGORIES.forEach(c=>{
-    const btn=document.createElement('button');btn.className='filter-btn'+(filterCats.has(c.id)?' active':'');
-    btn.innerHTML=`<span style="width:8px;height:8px;border-radius:2px;background:${c.color};display:inline-block"></span>${c.label}`;
-    if(filterCats.has(c.id))btn.style.background=c.color==='#F5C842'?'#c8a200':c.color;
-    btn.addEventListener('click',()=>{
-      filterCats.has(c.id)?filterCats.delete(c.id):filterCats.add(c.id);
-      buildFilterBar();render();
-    });
-    bar.appendChild(btn);
-  });
-
-  // Clear
-  if(hasFilters){
-    const clr=document.createElement('button');clr.className='filter-clear';clr.textContent='✕ Clear';
-    clr.addEventListener('click',()=>{filterPeople.clear();filterCats.clear();buildFilterBar();render();});
-    bar.appendChild(clr);
-  }
-}
-
 function filteredJobsForDate(date){
   return jobsForDate(date).filter(j=>{
     const peopleOk=filterPeople.size===0||filterPeople.has(j.person);
@@ -531,9 +474,43 @@ function filteredJobsForDate(date){
     return peopleOk&&catOk;
   });
 }
+function isTeamFull(dj){const b=new Set(dj.map(j=>j.person));return CONFLICT_CHECK_PEOPLE.every(p=>b.has(p))}
+function barLabel(j){return(j.seqf?j.seqf+' – ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠':j.person)+')'}
 
+// Filter bar
+function buildFilterBar(){
+  const bar=document.getElementById('filterBar');bar.innerHTML='';
+  const hasFilters=filterPeople.size>0||filterCats.size>0;
+  const pl=document.createElement('span');pl.className='filter-label';pl.textContent='Team';bar.appendChild(pl);
+  PEOPLE.filter(p=>p!=='Unassigned').forEach(p=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn'+(filterPeople.has(p)?' active':'');
+    btn.textContent=p;
+    if(filterPeople.has(p))btn.style.background='#378ADD';
+    btn.addEventListener('click',()=>{filterPeople.has(p)?filterPeople.delete(p):filterPeople.add(p);render();});
+    bar.appendChild(btn);
+  });
+  const div=document.createElement('div');div.className='filter-divider';bar.appendChild(div);
+  const cl=document.createElement('span');cl.className='filter-label';cl.textContent='Type';bar.appendChild(cl);
+  CATEGORIES.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn'+(filterCats.has(c.id)?' active':'');
+    btn.innerHTML=`<span style="width:8px;height:8px;border-radius:2px;background:${c.color};display:inline-block"></span>${c.label}`;
+    if(filterCats.has(c.id))btn.style.background=c.color==='#F5C842'?'#c8a200':c.color;
+    btn.addEventListener('click',()=>{filterCats.has(c.id)?filterCats.delete(c.id):filterCats.add(c.id);render();});
+    bar.appendChild(btn);
+  });
+  if(hasFilters){
+    const clr=document.createElement('button');clr.className='filter-clear';clr.textContent='✕ Clear';
+    clr.addEventListener('click',()=>{filterPeople.clear();filterCats.clear();render();});
+    bar.appendChild(clr);
+  }
+}
 
+// Render
+function render(){
   document.getElementById('monthLabel').textContent=new Date(curYear,curMonth-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
+  buildFilterBar();
   renderDesktop();
   renderMobileDots();
   renderDayPanel();
@@ -605,12 +582,7 @@ function renderMobileMonth(){
       const td=document.createElement('td');
       const dj=filteredJobsForDate(cell.date);
       if(isTeamFull(jobsForDate(cell.date)))td.style.outline='2px solid var(--red)';
-      td.addEventListener('click',()=>{
-        selectedDate=cell.date;
-        setMobileView('detail');
-        renderMobileDots();
-        renderDayPanel();
-      });
+      td.addEventListener('click',()=>{selectedDate=cell.date;setMobileView('detail');renderMobileDots();renderDayPanel();});
       const dn=document.createElement('div');
       dn.className='mo-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
       dn.textContent=parseInt(cell.date.split('-')[2]);
@@ -656,11 +628,16 @@ function renderDayPanel(){
 function renderConflicts(){
   const conflicts=[];
   const checkable=jobs.filter(j=>!getCat(j.cat).noConflict);
-  for(let i=0;i<checkable.length;i++){for(let k=i+1;k<checkable.length;k++){
-    const a=checkable[i],b=checkable[k];if(a.person!==b.person)continue;
-    const aS=toDate(a.start),aE=toDate(a.end),bS=toDate(b.start),bE=toDate(b.end);
-    if(aS<=bE&&bS<=aE){const os=new Date(Math.max(aS,bS)),oe=new Date(Math.min(aE,bE));conflicts.push({person:a.person,job1:a.name,job2:b.name,from:fmt(os),to:fmt(oe)});}
-  }}
+  for(let i=0;i<checkable.length;i++){
+    for(let k=i+1;k<checkable.length;k++){
+      const a=checkable[i],b=checkable[k];if(a.person!==b.person)continue;
+      const aS=toDate(a.start),aE=toDate(a.end),bS=toDate(b.start),bE=toDate(b.end);
+      if(aS<=bE&&bS<=aE){
+        const os=new Date(Math.max(aS,bS)),oe=new Date(Math.min(aE,bE));
+        conflicts.push({person:a.person,job1:a.name,job2:b.name,from:fmt(os),to:fmt(oe)});
+      }
+    }
+  }
   const list=document.getElementById('conflictList');
   const count=document.getElementById('conflictCount');
   count.textContent=conflicts.length+' issue'+(conflicts.length===1?'':'s');
@@ -711,7 +688,9 @@ function jumpToJob(id){
   },50);
 }
 
-document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))document.getElementById('searchDropdown').style.display='none';});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search-wrap'))document.getElementById('searchDropdown').style.display='none';
+});
 </script>
 </body>
 </html>
