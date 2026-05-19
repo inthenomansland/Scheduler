@@ -34,19 +34,13 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 
 /* App */
 #appScreen{display:none;min-height:100vh}
-
-/* Topbar */
 .topbar{background:var(--black);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{display:flex;align-items:center;gap:2px;font-size:22px;font-weight:700;letter-spacing:-0.5px}
 .logo .pro{color:var(--white)}.logo .av{color:var(--green)}
 .logo sup{font-size:9px;color:#555;font-weight:500;margin-left:1px;align-self:flex-start;margin-top:3px}
 .topbar-right{display:flex;align-items:center;gap:8px}
 .topbar-label{font-size:12px;font-weight:500;color:var(--grey-400);letter-spacing:0.08em;text-transform:uppercase;margin-left:12px;padding-left:12px;border-left:1px solid #333}
-
-/* Main */
 .main{padding:1.25rem 1.5rem 3rem}
-
-/* Cal toolbar */
 .cal-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
 .cal-toolbar-left{display:flex;align-items:center;gap:8px;flex:1}
 .month-display{font-size:18px;font-weight:600;color:var(--black);min-width:160px}
@@ -57,8 +51,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .btn-primary:hover{background:var(--green-dark)}
 .btn-ghost{background:var(--white);border:1px solid var(--grey-200);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--grey-700);cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn-ghost:hover{border-color:var(--grey-400)}
-
-/* Search */
 .search-wrap{position:relative;min-width:160px;max-width:220px;flex:1}
 .search-wrap input{width:100%;font-size:13px;padding:7px 10px 7px 32px;border:1px solid var(--grey-200);border-radius:8px;outline:none;background:var(--white);font-family:inherit;color:var(--grey-900)}
 .search-wrap input:focus{border-color:var(--green)}
@@ -66,10 +58,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 #searchDropdown{display:none;position:absolute;top:38px;left:0;width:310px;max-width:90vw;background:var(--white);border:1px solid var(--grey-200);border-radius:12px;box-shadow:var(--shadow-lg);z-index:500;max-height:280px;overflow-y:auto}
 
 /* Legend */
-.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:1rem}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0.75rem}
 .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey-700);font-weight:500}
 .legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 .cat-note{font-size:10px;color:var(--grey-400);font-weight:400}
+
+/* Filter bar */
+.filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;align-items:center}
+.filter-section-label{font-size:11px;font-weight:700;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.07em}
+.filter-divider{width:1px;height:20px;background:var(--grey-200);margin:0 4px;flex-shrink:0}
+.filter-btn{border:1px solid var(--grey-200);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;background:var(--white);color:var(--grey-700);font-family:inherit;display:flex;align-items:center;gap:5px;transition:all 0.15s}
+.filter-btn:hover{border-color:var(--grey-400)}
+.filter-btn.active{color:var(--white);border-color:transparent}
+.filter-clear{border:none;background:none;font-size:12px;color:var(--grey-400);cursor:pointer;font-family:inherit;padding:4px 8px;font-weight:600}
+.filter-clear:hover{color:var(--red)}
 
 /* Desktop calendar */
 .cal-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
@@ -90,8 +92,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .view-toggle{display:flex;gap:4px;background:var(--grey-100);border-radius:8px;padding:3px;border:1px solid var(--grey-200)}
 .view-toggle button{border:none;background:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--grey-400);font-family:inherit;transition:all 0.15s}
 .view-toggle button.active{background:var(--white);color:var(--black);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
-
-/* Mobile dot view */
 .cal-mobile-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow);padding:12px}
 .cal-mobile-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
 .cal-mobile-header span{text-align:center;font-size:10px;font-weight:700;color:var(--grey-400);padding:4px 0;text-transform:uppercase;letter-spacing:0.06em}
@@ -106,8 +106,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .cal-mobile-cell.team-full{outline:2px solid var(--red);border-radius:8px}
 .cal-mobile-dots{display:flex;gap:2px;justify-content:center}
 .cal-mobile-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
-
-/* Mobile month overview */
 .cal-month-wrap{background:var(--white);border-radius:14px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:var(--shadow)}
 .cal-month-table{width:100%;border-collapse:collapse}
 .cal-month-table th{font-size:9px;color:var(--grey-400);padding:7px 2px;text-align:center;border-bottom:1px solid var(--grey-200);font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
@@ -118,8 +116,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .mo-num.today{background:var(--green);color:var(--white);font-weight:700}
 .mo-num.other-month{color:var(--grey-200)}
 .mo-bar{font-size:8px;font-weight:500;border-radius:3px;padding:1px 3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
-
-/* Day panel */
 .day-panel{margin-top:12px}
 .day-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
 .day-panel-title{font-size:15px;font-weight:600;color:var(--black)}
@@ -127,15 +123,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .day-card{background:var(--white);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;border:1px solid var(--grey-200);border-left:4px solid var(--grey-200);box-shadow:var(--shadow)}
 .day-card-title{font-size:14px;font-weight:600;color:var(--black);margin-bottom:5px}
 .day-card-meta{font-size:12px;color:var(--grey-400);display:flex;flex-wrap:wrap;gap:8px}
-
-/* Conflict panel */
 .conflict-panel{background:var(--white);border:1px solid var(--grey-200);border-radius:14px;padding:1.1rem 1.25rem;margin-top:1rem;box-shadow:var(--shadow)}
 .conflict-panel h3{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;color:var(--black);text-transform:uppercase;letter-spacing:0.05em}
 .conflict-item{font-size:13px;color:var(--grey-700);padding:6px 0;border-bottom:1px solid var(--grey-100)}
 .conflict-item:last-child{border-bottom:none}
 .no-conflicts{font-size:13px;color:var(--grey-400);font-style:italic}
-
-/* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--white);border-radius:16px;padding:1.75rem;width:430px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
@@ -159,7 +151,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
 .view-value{font-size:14px;color:var(--grey-900);font-weight:500}
 .notes-box{margin-top:4px;padding:10px 12px;background:var(--grey-100);border-radius:8px;font-size:13px;color:var(--grey-700);line-height:1.6}
 
-/* Mobile overrides */
 @media(max-width:768px){
   .topbar{padding:0 1rem;height:52px}
   .topbar-label{display:none}
@@ -220,8 +211,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
     </div>
 
     <div class="legend" id="legend"></div>
+    <div class="filter-bar" id="filterBar"></div>
 
-    <!-- Desktop -->
     <div class="cal-wrap">
       <table class="cal-desktop">
         <thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
@@ -229,7 +220,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
       </table>
     </div>
 
-    <!-- Mobile -->
     <div class="cal-mobile" id="calMobile">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <span style="font-size:12px;font-weight:600;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.06em">View</span>
@@ -238,8 +228,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
           <button id="btnMonth" onclick="setMobileView('month')">Month</button>
         </div>
       </div>
-
-      <!-- Detail view -->
       <div id="detailView">
         <div class="cal-mobile-wrap">
           <div class="cal-mobile-header">
@@ -255,8 +243,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
           <div id="dayPanelJobs"></div>
         </div>
       </div>
-
-      <!-- Month overview -->
       <div id="monthView" style="display:none">
         <div class="cal-month-wrap">
           <table class="cal-month-table">
@@ -274,7 +260,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
   </div>
 </div>
 
-<!-- View modal -->
 <div class="modal-overlay" id="viewOverlay">
   <div class="modal-box">
     <h3 id="viewTitle"></h3>
@@ -283,7 +268,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
   </div>
 </div>
 
-<!-- Edit modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box">
     <h3 id="modalTitle">Add job</h3>
@@ -319,6 +303,7 @@ function getCat(id){return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]}
 
 let jobs=[], curYear=new Date().getFullYear(), curMonth=new Date().getMonth()+1;
 let selectedDate=fmt(new Date()), editingId=null, isAdmin=false, mobileView='detail';
+let filterPeople=new Set(), filterCats=new Set();
 
 // Swipe
 let txStart=0;
@@ -357,6 +342,69 @@ sb.auth.onAuthStateChange((e,s)=>{if(s)showApp();});
 async function loadJobs(){
   const{data,error}=await sb.from('jobs').select('*').order('start_date');
   if(!error)jobs=data.map(j=>({id:j.id,name:j.name,cat:j.cat,person:j.person,start:j.start_date,end:j.end_date,notes:j.notes,seqf:j.seqf,pm:j.pm}));
+}
+
+// Filters
+function filteredJobs(dateJobs){
+  if(filterPeople.size===0&&filterCats.size===0)return dateJobs;
+  return dateJobs.filter(j=>{
+    const pOk=filterPeople.size===0||filterPeople.has(j.person);
+    const cOk=filterCats.size===0||filterCats.has(j.cat);
+    return pOk&&cOk;
+  });
+}
+
+function buildFilterBar(){
+  const bar=document.getElementById('filterBar');
+  bar.innerHTML='';
+  const hasFilters=filterPeople.size>0||filterCats.size>0;
+
+  // Team label
+  const pl=document.createElement('span');pl.className='filter-section-label';pl.textContent='Team';bar.appendChild(pl);
+
+  // People buttons
+  PEOPLE.filter(p=>p!=='Unassigned').forEach(p=>{
+    const active=filterPeople.has(p);
+    const btn=document.createElement('button');
+    btn.className='filter-btn'+(active?' active':'');
+    btn.textContent=p;
+    if(active)btn.style.background='#378ADD';
+    btn.addEventListener('click',()=>{
+      active?filterPeople.delete(p):filterPeople.add(p);
+      render();
+    });
+    bar.appendChild(btn);
+  });
+
+  // Divider
+  const div=document.createElement('div');div.className='filter-divider';bar.appendChild(div);
+
+  // Type label
+  const cl=document.createElement('span');cl.className='filter-section-label';cl.textContent='Type';bar.appendChild(cl);
+
+  // Category buttons
+  CATEGORIES.forEach(c=>{
+    const active=filterCats.has(c.id);
+    const btn=document.createElement('button');
+    btn.className='filter-btn'+(active?' active':'');
+    const dot=`<span style="width:8px;height:8px;border-radius:2px;background:${c.color};display:inline-block;flex-shrink:0"></span>`;
+    btn.innerHTML=dot+c.label;
+    if(active)btn.style.background=c.color==='#F5C842'?'#b8960a':c.color;
+    btn.addEventListener('click',()=>{
+      active?filterCats.delete(c.id):filterCats.add(c.id);
+      render();
+    });
+    bar.appendChild(btn);
+  });
+
+  // Clear button
+  if(hasFilters){
+    const clr=document.createElement('button');
+    clr.className='filter-clear';
+    clr.textContent='✕ Clear';
+    clr.addEventListener('click',()=>{filterPeople.clear();filterCats.clear();render();});
+    bar.appendChild(clr);
+  }
 }
 
 // Mobile view toggle
@@ -471,6 +519,7 @@ function barLabel(j){return(j.seqf?j.seqf+' – ':'')+j.name+(j.notes?' 📋':''
 // Render
 function render(){
   document.getElementById('monthLabel').textContent=new Date(curYear,curMonth-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
+  buildFilterBar();
   renderDesktop();
   renderMobileDots();
   renderDayPanel();
@@ -488,8 +537,9 @@ function renderDesktop(){
     for(let c=0;c<7;c++){
       const cell=cells[r*7+c];
       const td=document.createElement('td');
-      const dj=jobsForDate(cell.date);
-      if(isTeamFull(dj))td.style.outline='2px solid var(--red)';
+      const allDj=jobsForDate(cell.date);
+      const dj=filteredJobs(allDj);
+      if(isTeamFull(allDj))td.style.outline='2px solid var(--red)';
       td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
       const dn=document.createElement('div');
       dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
@@ -515,9 +565,10 @@ function renderMobileDots(){
   const grid=document.getElementById('calMobileGrid');grid.innerHTML='';
   const today=fmt(new Date());
   buildCells().forEach(cell=>{
-    const dj=jobsForDate(cell.date);
+    const allDj=jobsForDate(cell.date);
+    const dj=filteredJobs(allDj);
     const div=document.createElement('div');
-    div.className='cal-mobile-cell'+(cell.other?' other-month':'')+(cell.date===today?' today':'')+(cell.date===selectedDate?' selected':'')+(isTeamFull(dj)?' team-full':'');
+    div.className='cal-mobile-cell'+(cell.other?' other-month':'')+(cell.date===today?' today':'')+(cell.date===selectedDate?' selected':'')+(isTeamFull(allDj)?' team-full':'');
     const num=document.createElement('div');num.className='cnum';num.textContent=parseInt(cell.date.split('-')[2]);div.appendChild(num);
     if(dj.length>0){
       const dots=document.createElement('div');dots.className='cal-mobile-dots';
@@ -540,14 +591,10 @@ function renderMobileMonth(){
     for(let c=0;c<7;c++){
       const cell=cells[r*7+c];
       const td=document.createElement('td');
-      const dj=jobsForDate(cell.date);
-      if(isTeamFull(dj))td.style.outline='2px solid var(--red)';
-      td.addEventListener('click',()=>{
-        selectedDate=cell.date;
-        setMobileView('detail');
-        renderMobileDots();
-        renderDayPanel();
-      });
+      const allDj=jobsForDate(cell.date);
+      const dj=filteredJobs(allDj);
+      if(isTeamFull(allDj))td.style.outline='2px solid var(--red)';
+      td.addEventListener('click',()=>{selectedDate=cell.date;setMobileView('detail');renderMobileDots();renderDayPanel();});
       const dn=document.createElement('div');
       dn.className='mo-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
       dn.textContent=parseInt(cell.date.split('-')[2]);
@@ -573,7 +620,7 @@ function renderDayPanel(){
   addBtn.style.display=isAdmin?'':'none';
   addBtn.onclick=()=>openAddModalDate(selectedDate);
   const container=document.getElementById('dayPanelJobs');container.innerHTML='';
-  const dj=jobsForDate(selectedDate);
+  const dj=filteredJobs(jobsForDate(selectedDate));
   if(!dj.length){container.innerHTML='<div class="day-panel-empty">No jobs scheduled</div>';return;}
   dj.forEach(j=>{
     const cat=getCat(j.cat);
