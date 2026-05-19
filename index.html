@@ -343,9 +343,14 @@ async function signIn(){
   const email=document.getElementById('authEmail').value.trim();
   const pass=document.getElementById('authPass').value;
   document.getElementById('authErr').textContent='';
-  const{error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){document.getElementById('authErr').textContent=error.message;return;}
-  showApp();
+  try{
+    const{error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){document.getElementById('authErr').textContent=error.message;return;}
+    await showApp();
+  }catch(err){
+    document.getElementById('authErr').textContent='Sign in failed. Please try again.';
+    console.error(err);
+  }
 }
 async function signOut(){
   await sb.auth.signOut();
@@ -361,7 +366,7 @@ async function showApp(){
   await loadJobs();
   render();
 }
-sb.auth.onAuthStateChange((e,s)=>{if(s)showApp();});
+sb.auth.onAuthStateChange((e,s)=>{if(s&&e==='SIGNED_IN')showApp();});
 
 // Data
 async function loadJobs(){
