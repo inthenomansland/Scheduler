@@ -639,7 +639,8 @@ function renderDayPanel(){
 
 function renderConflicts(){
   const conflicts=[];
-  const checkable=jobs.filter(j=>!getCat(j.cat).noConflict);
+  const today=toDate(fmt(new Date()));
+  const checkable=jobs.filter(j=>!getCat(j.cat).noConflict&&toDate(j.end)>=today);
   for(let i=0;i<checkable.length;i++){for(let k=i+1;k<checkable.length;k++){
     const a=checkable[i],b=checkable[k];if(a.person!==b.person)continue;
     const aS=toDate(a.start),aE=toDate(a.end),bS=toDate(b.start),bE=toDate(b.end);
