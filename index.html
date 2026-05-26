@@ -280,9 +280,16 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--grey-100);color:v
     <div class="field"><label>End date</label><input type="date" id="fEnd"></div>
     <div class="field"><label>Notes</label><textarea id="fNotes" rows="3" placeholder="e.g. Bring spare cables, client contact is John..."></textarea></div>
     <div class="modal-btns">
-      <button id="delBtn" class="del-btn" style="display:none;margin-right:auto">Delete</button>
+      <button id="delBtn" class="del-btn" style="display:none;margin-right:auto" onclick="confirmDelete()">Delete</button>
       <button id="cancelBtn">Cancel</button>
       <button id="saveBtn" class="save-btn">Save</button>
+    </div>
+    <div id="delConfirm" style="display:none;margin-top:12px;padding:12px;background:#fff5f5;border-radius:8px;border:1px solid #fdd;font-size:13px;color:var(--grey-700)">
+      Are you sure you want to delete this job?
+      <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+        <button onclick="document.getElementById('delConfirm').style.display='none'" style="border:1px solid var(--grey-200);background:var(--white);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:13px">Cancel</button>
+        <button onclick="deleteJob()" style="border:none;background:var(--red);color:var(--white);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Yes, delete</button>
+      </div>
     </div>
   </div>
 </div>
@@ -417,7 +424,10 @@ function setMobileView(v){
 }
 
 // Modals
-function openModal(){document.getElementById('modalOverlay').classList.add('open')}
+function openModal(){
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('delConfirm').style.display='none';
+}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
 document.getElementById('cancelBtn').addEventListener('click',e=>{e.stopPropagation();closeModal();});
 document.getElementById('saveBtn').addEventListener('click',saveJob);
@@ -482,8 +492,11 @@ async function saveJob(){
   else{await sb.from('jobs').insert({name,cat,person,start_date:start,end_date:end,notes,seqf,pm});}
   await loadJobs();render();
 }
+function confirmDelete(){
+  document.getElementById('delConfirm').style.display='block';
+}
 async function deleteJob(){
-  if(!confirm('Delete this job?'))return;
+  document.getElementById('delConfirm').style.display='none';
   closeModal();
   await sb.from('jobs').delete().eq('id',editingId);
   await loadJobs();render();
