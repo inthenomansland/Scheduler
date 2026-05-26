@@ -8,7 +8,7 @@ A lightweight, browser-based team scheduling tool built for ProAV. It provides a
 
 **Live URL:** `https://inthenomansland.github.io/Scheduler`
 
-Sign in with your ProAV email address and password. Contact Ashton if you need an account set up.
+Sign in with your ProAV email address and password. Contact the scheduler admin if you need an account set up.
 
 ---
 
@@ -62,21 +62,6 @@ Sign in with your ProAV email address and password. Contact Ashton if you need a
 
 ---
 
-## Team Members
-
-Current team in the app:
-
-- Ashton (admin)
-- Scott
-- Chris
-- Ross
-- Aidan
-- Alain
-
-Scott is excluded from the "team full" indicator by design.
-
----
-
 ## User Roles
 
 ### Granting admin access
@@ -106,12 +91,12 @@ Any user invited via Supabase Authentication who does not have the admin role wi
 1. Open `index.html` in GitHub
 2. Find the `PEOPLE` array near the top of the `<script>` section:
 ```js
-const PEOPLE=['Unassigned','Ashton','Scott','Chris','Ross','Aidan','Alain'];
+const PEOPLE=['Unassigned','Team Member 1','Team Member 2'];
 ```
 3. Add their name to the list
 4. If they should be included in the "team full" check, also add them to:
 ```js
-const CONFLICT_CHECK_PEOPLE=['Ashton','Chris','Ross','Aidan','Alain'];
+const CONFLICT_CHECK_PEOPLE=['Team Member 1','Team Member 2'];
 ```
 5. Commit the change — live within 60 seconds
 
