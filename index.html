@@ -314,7 +314,7 @@ let filterPeople=new Set(), filterCats=new Set();
 
 async function loadBankHolidays(){
   try{
-    const r=await fetch('https://www.gov.uk/bank-holidays.json');
+    const r=await fetch('https://corsproxy.io/?https://www.gov.uk/bank-holidays.json');
     const d=await r.json();
     d['england-and-wales'].events.forEach(e=>bankHolidays.add(e.date));
   }catch(e){console.warn('Could not load bank holidays',e);}
