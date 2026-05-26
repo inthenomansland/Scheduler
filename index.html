@@ -308,9 +308,17 @@ const CATEGORIES=[
 ];
 function getCat(id){return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]}
 
-let jobs=[], curYear=new Date().getFullYear(), curMonth=new Date().getMonth()+1;
+let jobs=[], bankHolidays=new Set(), curYear=new Date().getFullYear(), curMonth=new Date().getMonth()+1;
 let selectedDate=fmt(new Date()), editingId=null, isAdmin=false, mobileView='detail';
 let filterPeople=new Set(), filterCats=new Set();
+
+async function loadBankHolidays(){
+  try{
+    const r=await fetch('https://www.gov.uk/bank-holidays.json');
+    const d=await r.json();
+    d['england-and-wales'].events.forEach(e=>bankHolidays.add(e.date));
+  }catch(e){console.warn('Could not load bank holidays',e);}
+}
 
 // Swipe
 let txStart=0;
@@ -340,6 +348,7 @@ async function showApp(){
   const{data:{user}}=await sb.auth.getUser();
   isAdmin=user?.user_metadata?.role==='admin';
   document.getElementById('addJobBtn').style.display=isAdmin?'':'none';
+  await loadBankHolidays();
   await loadJobs();
   render();
 }
@@ -553,11 +562,19 @@ function renderDesktop(){
       const allDj=jobsForDate(cell.date);
       const dj=filteredJobs(allDj);
       if(isTeamFull(allDj))td.style.outline='2px solid var(--red)';
+      if(bankHolidays.has(cell.date))td.style.background='#f0f7ff';
       td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
       const dn=document.createElement('div');
       dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
       dn.textContent=parseInt(cell.date.split('-')[2]);
-      td.appendChild(dn);
+      if(bankHolidays.has(cell.date)){
+        const bh=document.createElement('div');
+        bh.style.cssText='font-size:9px;font-weight:600;color:#378ADD;margin-bottom:2px;text-transform:uppercase;letter-spacing:0.04em';
+        bh.textContent='Bank Holiday';
+        td.appendChild(dn);td.appendChild(bh);
+      } else {
+        td.appendChild(dn);
+      }
       dj.forEach(j=>{
         const cat=getCat(j.cat);
         const bar=document.createElement('div');bar.className='job-bar';
@@ -580,10 +597,21 @@ function renderMobileDots(){
   buildCells().forEach(cell=>{
     const allDj=jobsForDate(cell.date);
     const dj=filteredJobs(allDj);
+    const isBH=bankHolidays.has(cell.date);
     const div=document.createElement('div');
     div.className='cal-mobile-cell'+(cell.other?' other-month':'')+(cell.date===today?' today':'')+(cell.date===selectedDate?' selected':'')+(isTeamFull(allDj)?' team-full':'');
+    if(isBH)div.style.background=cell.date===selectedDate?'#ddeeff':'#f0f7ff';
     const num=document.createElement('div');num.className='cnum';num.textContent=parseInt(cell.date.split('-')[2]);div.appendChild(num);
-    if(dj.length>0){
+    if(isBH){
+      const bd=document.createElement('div');
+      bd.style.cssText='width:6px;height:6px;border-radius:50%;background:#378ADD;flex-shrink:0';
+      const dots=document.createElement('div');dots.className='cal-mobile-dots';
+      dots.appendChild(bd);
+      [...new Set(dj.map(j=>getCat(j.cat).color))].slice(0,2).forEach(color=>{
+        const dot=document.createElement('div');dot.className='cal-mobile-dot';dot.style.background=color;dots.appendChild(dot);
+      });
+      div.appendChild(dots);
+    } else if(dj.length>0){
       const dots=document.createElement('div');dots.className='cal-mobile-dots';
       [...new Set(dj.map(j=>getCat(j.cat).color))].slice(0,3).forEach(color=>{
         const dot=document.createElement('div');dot.className='cal-mobile-dot';dot.style.background=color;dots.appendChild(dot);
@@ -633,6 +661,12 @@ function renderDayPanel(){
   addBtn.style.display=isAdmin?'':'none';
   addBtn.onclick=()=>openAddModalDate(selectedDate);
   const container=document.getElementById('dayPanelJobs');container.innerHTML='';
+  if(bankHolidays.has(selectedDate)){
+    const bh=document.createElement('div');
+    bh.style.cssText='background:#f0f7ff;border-radius:12px;padding:10px 14px;margin-bottom:8px;border:1px solid #cce0ff;border-left:4px solid #378ADD;font-size:13px;font-weight:600;color:#378ADD';
+    bh.textContent='🇬🇧 Bank Holiday';
+    container.appendChild(bh);
+  }
   const dj=filteredJobs(jobsForDate(selectedDate));
   if(!dj.length){container.innerHTML='<div class="day-panel-empty">No jobs scheduled</div>';return;}
   dj.forEach(j=>{
