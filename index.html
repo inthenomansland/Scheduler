@@ -308,17 +308,11 @@ const CATEGORIES=[
 ];
 function getCat(id){return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]}
 
-let jobs=[], bankHolidays=new Set(), curYear=new Date().getFullYear(), curMonth=new Date().getMonth()+1;
+const BANK_HOLIDAYS=new Set(['2024-01-01','2024-03-29','2024-04-01','2024-05-06','2024-05-27','2024-08-26','2024-12-25','2024-12-26','2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26','2025-08-25','2025-12-25','2025-12-26','2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28','2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28']);
+
+let jobs=[], curYear=new Date().getFullYear(), curMonth=new Date().getMonth()+1;
 let selectedDate=fmt(new Date()), editingId=null, isAdmin=false, mobileView='detail';
 let filterPeople=new Set(), filterCats=new Set();
-
-async function loadBankHolidays(){
-  try{
-    const r=await fetch('https://corsproxy.io/?https://www.gov.uk/bank-holidays.json');
-    const d=await r.json();
-    d['england-and-wales'].events.forEach(e=>bankHolidays.add(e.date));
-  }catch(e){console.warn('Could not load bank holidays',e);}
-}
 
 // Swipe
 let txStart=0;
@@ -348,7 +342,6 @@ async function showApp(){
   const{data:{user}}=await sb.auth.getUser();
   isAdmin=user?.user_metadata?.role==='admin';
   document.getElementById('addJobBtn').style.display=isAdmin?'':'none';
-  await loadBankHolidays();
   await loadJobs();
   render();
 }
@@ -535,6 +528,7 @@ function buildCells(){
   return cells;
 }
 function jobsForDate(date){return jobs.filter(j=>{const s=toDate(j.start),e=toDate(j.end),cd=toDate(date);return cd>=s&&cd<=e;})}
+function isTeamFull(dj){const b=new Set(dj.map(j=>j.person));return CONFLICT_CHECK_PEOPLE.every(p=>b.has(p))}
 function isWeekend(dateStr){const d=toDate(dateStr);const day=d.getDay();return day===0||day===6;}
 function barLabel(j){return(j.seqf?j.seqf+' – ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠':j.person)+')'}
 
@@ -562,7 +556,7 @@ function renderDesktop(){
       const allDj=jobsForDate(cell.date);
       const dj=filteredJobs(allDj);
       if(isTeamFull(allDj))td.style.outline='2px solid var(--red)';
-      if(bankHolidays.has(cell.date))td.style.background='#f0f7ff';
+      if(BANK_HOLIDAYS.has(cell.date))td.style.background='#f0f7ff';
       if(isWeekend(cell.date)&&!cell.other)td.style.background='#fafafa';
       td.addEventListener('click',()=>{if(isAdmin&&!isWeekend(cell.date))openAddModalDate(cell.date);});
       const dn=document.createElement('div');
@@ -571,7 +565,7 @@ function renderDesktop(){
       if(isWeekend(cell.date)&&!cell.other){
         dn.style.color='var(--grey-200)';
       }
-      if(bankHolidays.has(cell.date)){
+      if(BANK_HOLIDAYS.has(cell.date)){
         const bh=document.createElement('div');
         bh.style.cssText='font-size:9px;font-weight:600;color:#378ADD;margin-bottom:2px;text-transform:uppercase;letter-spacing:0.04em';
         bh.textContent='Bank Holiday';
@@ -604,7 +598,7 @@ function renderMobileDots(){
   buildCells().forEach(cell=>{
     const allDj=jobsForDate(cell.date);
     const dj=filteredJobs(allDj);
-    const isBH=bankHolidays.has(cell.date);
+    const isBH=BANK_HOLIDAYS.has(cell.date);
     const isWE=isWeekend(cell.date);
     const div=document.createElement('div');
     div.className='cal-mobile-cell'+(cell.other?' other-month':'')+(cell.date===today?' today':'')+(cell.date===selectedDate?' selected':'')+(isTeamFull(allDj)?' team-full':'');
@@ -673,7 +667,7 @@ function renderDayPanel(){
   addBtn.style.display=isAdmin?'':'none';
   addBtn.onclick=()=>openAddModalDate(selectedDate);
   const container=document.getElementById('dayPanelJobs');container.innerHTML='';
-  if(bankHolidays.has(selectedDate)){
+  if(BANK_HOLIDAYS.has(selectedDate)){
     const bh=document.createElement('div');
     bh.style.cssText='background:#f0f7ff;border-radius:12px;padding:10px 14px;margin-bottom:8px;border:1px solid #cce0ff;border-left:4px solid #378ADD;font-size:13px;font-weight:600;color:#378ADD';
     bh.textContent='🇬🇧 Bank Holiday';
