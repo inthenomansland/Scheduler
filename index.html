@@ -535,7 +535,7 @@ function buildCells(){
   return cells;
 }
 function jobsForDate(date){return jobs.filter(j=>{const s=toDate(j.start),e=toDate(j.end),cd=toDate(date);return cd>=s&&cd<=e;})}
-function isTeamFull(dj){const b=new Set(dj.map(j=>j.person));return CONFLICT_CHECK_PEOPLE.every(p=>b.has(p))}
+function isWeekend(dateStr){const d=toDate(dateStr);const day=d.getDay();return day===0||day===6;}
 function barLabel(j){return(j.seqf?j.seqf+' – ':'')+j.name+(j.notes?' 📋':'')+' ('+(j.person==='Unassigned'?'⚠':j.person)+')'}
 
 // Render
@@ -563,10 +563,14 @@ function renderDesktop(){
       const dj=filteredJobs(allDj);
       if(isTeamFull(allDj))td.style.outline='2px solid var(--red)';
       if(bankHolidays.has(cell.date))td.style.background='#f0f7ff';
-      td.addEventListener('click',()=>{if(isAdmin)openAddModalDate(cell.date);});
+      if(isWeekend(cell.date)&&!cell.other)td.style.background='#fafafa';
+      td.addEventListener('click',()=>{if(isAdmin&&!isWeekend(cell.date))openAddModalDate(cell.date);});
       const dn=document.createElement('div');
       dn.className='day-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
       dn.textContent=parseInt(cell.date.split('-')[2]);
+      if(isWeekend(cell.date)&&!cell.other){
+        dn.style.color='var(--grey-200)';
+      }
       if(bankHolidays.has(cell.date)){
         const bh=document.createElement('div');
         bh.style.cssText='font-size:9px;font-weight:600;color:#378ADD;margin-bottom:2px;text-transform:uppercase;letter-spacing:0.04em';
@@ -575,7 +579,9 @@ function renderDesktop(){
       } else {
         td.appendChild(dn);
       }
-      dj.forEach(j=>{
+      if(!isWeekend(cell.date)){
+        dj.forEach(j=>{
+        if(isWeekend(cell.date))return;
         const cat=getCat(j.cat);
         const bar=document.createElement('div');bar.className='job-bar';
         bar.style.background=cat.color+'28';
@@ -585,6 +591,7 @@ function renderDesktop(){
         bar.addEventListener('click',e=>{e.stopPropagation();isAdmin?openEditModal(j.id):openViewModal(j.id);});
         td.appendChild(bar);
       });
+      }
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
@@ -598,11 +605,14 @@ function renderMobileDots(){
     const allDj=jobsForDate(cell.date);
     const dj=filteredJobs(allDj);
     const isBH=bankHolidays.has(cell.date);
+    const isWE=isWeekend(cell.date);
     const div=document.createElement('div');
     div.className='cal-mobile-cell'+(cell.other?' other-month':'')+(cell.date===today?' today':'')+(cell.date===selectedDate?' selected':'')+(isTeamFull(allDj)?' team-full':'');
+    if(isWE&&!cell.other)div.style.opacity='0.35';
     if(isBH)div.style.background=cell.date===selectedDate?'#ddeeff':'#f0f7ff';
     const num=document.createElement('div');num.className='cnum';num.textContent=parseInt(cell.date.split('-')[2]);div.appendChild(num);
-    if(isBH){
+    if(!isWE){
+      if(isBH){
       const bd=document.createElement('div');
       bd.style.cssText='width:6px;height:6px;border-radius:50%;background:#378ADD;flex-shrink:0';
       const dots=document.createElement('div');dots.className='cal-mobile-dots';
@@ -617,6 +627,7 @@ function renderMobileDots(){
         const dot=document.createElement('div');dot.className='cal-mobile-dot';dot.style.background=color;dots.appendChild(dot);
       });
       div.appendChild(dots);
+    }
     }
     div.addEventListener('click',()=>{selectedDate=cell.date;renderMobileDots();renderDayPanel();});
     grid.appendChild(div);
@@ -635,6 +646,7 @@ function renderMobileMonth(){
       const allDj=jobsForDate(cell.date);
       const dj=filteredJobs(allDj);
       if(isTeamFull(allDj))td.style.outline='2px solid var(--red)';
+      if(isWeekend(cell.date)&&!cell.other)td.style.opacity='0.35';
       td.addEventListener('click',()=>{selectedDate=cell.date;setMobileView('detail');renderMobileDots();renderDayPanel();});
       const dn=document.createElement('div');
       dn.className='mo-num'+(cell.other?' other-month':'')+(cell.date===today?' today':'');
